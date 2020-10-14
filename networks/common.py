@@ -5,12 +5,12 @@ Methods to create a Keras Functional Model.
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 import json
-from .layers.non_local import Non_local_nn
-from .layers.approx_round import *
-from .layers.inception import Inception
-from .layers.reverse_inception import ReverseInception
-from .layers.lstm_reshape import LSTM_Reshape,LSTM_Unshape
-from .layers.split import Split,BasicCNNSplit,ChannelFilter
+from .customLayers.non_local import Non_local_nn
+from .customLayers.approx_round import *
+from .customLayers.inception import Inception
+from .customLayers.reverse_inception import ReverseInception
+from .customLayers.lstm_reshape import LSTM_Reshape,LSTM_Unshape
+from .customLayers.split import Split,BasicCNNSplit,ChannelFilter
 import tensorflow.keras.backend as K
 
 import collections.abc

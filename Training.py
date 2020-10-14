@@ -3,6 +3,8 @@ import argparse
 from utils.utils import LoadConfig,LoadMethod,LoadDataset
 from utils.backends import InitializeBackend
 
+import tensorflow as tf
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", "--backend", required=False, default="Tensorflow1",
                     help="Specify which NN backend to use.",
@@ -21,15 +23,15 @@ backend = args.backend #Globally defined variable that is used to select backend
 settings = LoadConfig(args.configFile)
 
 #Loading the Model
-InitializeBackend()
+# InitializeBackend()
 model = LoadMethod(settings,processor=args.processor)
 
 ########## Loading the DataSet ########
-dataset = LoadDataset(settings)
+# dataset = LoadDataset(settings)
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 # dataset is a dictionary of lists, typically:
 # dataset = {"images": [Array of images],
 #            "labels": [Array of labels]}
 
-print(dir())
 #Training
-# model.train(dataset)
+model.Train((x_train, y_train))
