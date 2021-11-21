@@ -18,8 +18,10 @@ def LoadConfig(targetFileName,**kwargs):
         settings = json.load(json_file)
     return settings
 
+
 def InitializeBackend(**kwargs):
     print(backend)
+
 
 def LoadMethod(settingDict,**kwargs):
     Method = GetFunction(settingDict["Method"])
@@ -45,7 +47,6 @@ def LoadDataset(settingDict):
         pass
 
 
-
 def CheckFilled(requiredParams,dictionary,fileName=None):
     valid = True
     for requiredParam in requiredParams:
@@ -58,6 +59,7 @@ def CheckFilled(requiredParams,dictionary,fileName=None):
     if not valid:
         print("Missing one or parameters. Exiting")
         exit()
+
 
 def UpdateNestedDictionary(defaultSettings,overrides):
     for label,override in overrides.items():
@@ -73,6 +75,7 @@ def GetFunction(string):
     module = import_module(module_name)
     func = getattr(module,func_name)
     return func
+
 
 def CreatePath(path, override=False):
     """
@@ -90,6 +93,7 @@ def CreatePath(path, override=False):
             os.makedirs(path)
         except OSError:
             raise OSError("Creation of the directory {} failed".format(path))
+
 
 class MovingAverage:
     """MovingAverage
