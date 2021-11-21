@@ -6,13 +6,13 @@ define run_command
 			--network=host \
 			-v ${PWD}:${PWD} \
 			-w ${PWD} \
-			raide-rl \
+			vision-tf2 \
 			$(1)
 endef
 
 #Can't be the same name as a directory
 image:
-	docker build --rm -t raide-rl -f docker/raide-rl/Dockerfile docker/raide-rl
+	docker build --rm -t vision-tf2 -f docker/vision-tf2/Dockerfile docker/vision-tf2
 
 dev:
 	$(call run_command,bash)
@@ -23,20 +23,10 @@ tensorboard:
 		--network=host \
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \
-		raide-rl \
+		vision-tf2 \
 		tensorboard --logdir=logs
 
 clean:
-	rm -r images/ logs/ models/
-
-env:
-	conda env create -f rl.yml
-
-# tensorboard:
-# 	google-chrome http://localhost:6006
-# 	tensorboard --logdir=logs &> /dev/null
-
-cluster:
-	ssh nealeav2@cc-login.campuscluster.illinois.edu
+	rm -r logs/ models/
 
 .PHONY: install build
