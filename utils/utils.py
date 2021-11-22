@@ -19,10 +19,6 @@ def LoadConfig(targetFileName,**kwargs):
     return settings
 
 
-def InitializeBackend(**kwargs):
-    print(backend)
-
-
 def LoadMethod(settingDict,**kwargs):
     Method = GetFunction(settingDict["Method"])
     net = Method(settingDict)
@@ -93,69 +89,3 @@ def CreatePath(path, override=False):
             os.makedirs(path)
         except OSError:
             raise OSError("Creation of the directory {} failed".format(path))
-
-
-class MovingAverage:
-    """MovingAverage
-    Container that only store give size of element, and store moving average.
-    Queue structure of container.
-    """
-
-    def __init__(self, size):
-        """__init__
-
-        :param size: number of element that will be stored in he container
-        """
-        from collections import deque
-        self.average = 0.0
-        self.size = size
-
-        self.queue = deque(maxlen=size)
-
-    def __call__(self):
-        """__call__"""
-        return self.average
-    def std(self):
-        """__call__"""
-        if len(self.queue) < 2:
-            return 1
-        return np.std(np.asarray(self.queue))
-
-    def tolist(self):
-        """tolist
-        Return the elements in the container in (list) structure
-        """
-        return list(self.queue)
-
-    def extend(self, l: list):
-        """extend
-
-        Similar to list.extend
-
-        :param l (list): list of number that will be extended in the deque
-        """
-        # Append list of numbers
-        self.queue.extend(l)
-        self.size = len(self.queue)
-        self.average = sum(self.queue) / self.size
-
-    def append(self, n):
-        """append
-
-        Element-wise appending in the container
-
-        :param n: number that will be appended on the container.
-        """
-        s = len(self.queue)
-        if s == self.size:
-            self.average = ((self.average * self.size) - self.queue[0] + n) / self.size
-        else:
-            self.average = (self.average * s + n) / (s + 1)
-        self.queue.append(n)
-
-    def clear(self):
-        """clear
-        reset the container
-        """
-        self.average = 0.0
-        self.queue.clear()
