@@ -8,14 +8,4 @@ RUN apt-get update && \
         git \
         unzip wget
 
-RUN pip install pandas scikit-learn scipy seaborn scikit-image matplotlib
-
-RUN apt-get update \
-  && apt-get install -y -qq --no-install-recommends \
-    libglvnd0 \
-    libgl1 \
-    libglx0 \
-    libegl1 \
-    libxext6 \
-    libx11-6 \
-  && rm -rf /var/lib/apt/lists/*
+RUN pip install pandas scikit-learn scipy seaborn scikit-image matplotlib gitpython
