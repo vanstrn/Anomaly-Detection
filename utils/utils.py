@@ -19,30 +19,6 @@ def LoadConfig(targetFileName,**kwargs):
     return settings
 
 
-def LoadMethod(settingDict,**kwargs):
-    Method = GetFunction(settingDict["Method"])
-    net = Method(settingDict)
-    return net
-
-
-def LoadDataset(settingDict):
-    return None
-    datasetConfigs = settingDict["Dataset"]
-
-    if datasetConfig["Type"] == "local":
-        #Reading in images or data from local disk:
-        pass
-    elif datasetConfig["Type"] == "web":
-        #Downloading Images from websource
-        pass
-    elif datasetConfig["Type"] == "tensorflow":
-        pass
-    elif datasetConfig["Type"] == "pytorch":
-        pass
-    else:
-        pass
-
-
 def CheckFilled(requiredParams,dictionary,fileName=None):
     valid = True
     for requiredParam in requiredParams:
