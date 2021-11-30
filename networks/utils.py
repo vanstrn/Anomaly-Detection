@@ -5,7 +5,7 @@ Various utility functions used for processing and updating JSON definition of ne
 import json
 import collections.abc
 import os
-from utils.utils import UpdateNestedDictionary
+
 
 def LoadJSONFile(fileName):
     #Checking if JSON file is fully defined path or just a file name without path.
