@@ -1,18 +1,14 @@
 { "RunName":"Test",
-  "GPUCapacitty":0.95,
-  "NetworkHPs":{"Game":"MG4R",
-    "NetworkConfig":"netConfigs/BasicClassifier/BasicClassifier.json"},
-  "SampleEpisodes":150,
-  "MaxEpisodeSteps":150,
-  "MAX_EP_STEPS":150,
-  "MaxEpisodes":50000,
-  "UPDATE_GLOBAL_ITER":151,
-  "SaveFreq":100000,
-  "LogFreq":100,
-  "PopulationSize":2,
+  "NetworkHPs":{
+    "NetworkConfig":"netConfigs/BasicClassifier/BasicClassifier.json",
+    "Epochs":1
+  },
 
   "Method":"methods.BasicClassifier.BasicClassifier",
 
-  "LoggingFunctions":[]
+  "Callbacks":[
+    {"Name":"utils.callbacks.TensorboardCallback",
+      "Arguments":{}}
+    ]
 
   }

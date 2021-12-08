@@ -1,16 +1,14 @@
 { "NetworkName" : "BasicClassifier",
-  "NetworkBuilder":"network",
   "DefaultParams":{ "SFSize":256,
                     "Filters":128,
                     "KernalSize":3,
-                    "OutputSize":10,
                     "FCUnits":256},
-                    "Inputs":{"state":[28,28,1]},
+
   "NetworkStructure":{
     "Shared":[
       { "layerType":"Conv2D",
         "layerName":"Conv2D_1",
-        "layerInput":"input.state",
+        "layerInput":"input.image",
         "Parameters":{"filters":"Filters//4",
                       "kernel_size":"KernalSize*2",
                       "strides":2,
@@ -37,7 +35,7 @@
         "layerName":"Dense1",
         "layerInput":"Flatten",
         "Parameters":{"units":"SFSize",
-                      "activation":null}},
+                      "activation":"relu"}},
       { "layerType":"Dense",
         "layerName":"Critic_FC1",
         "layerInput":"Dense1",
@@ -46,22 +44,9 @@
       { "layerType":"Dense",
         "layerName":"Classifier",
         "layerInput":"Critic_FC1",
-        "Parameters":{"units":"OutputSize",
+        "Output":true,
+        "Parameters":{"units":"classes",
                       "activation":null}}
     ]
-  },
-  "NetworkOutputs":{
-    "Classifier":"Classifier"
-  },
-  "NetworkOutputs":[
-    {
-      "Classifier":"Classifier"
-    }
-  ],
-  "NetworkInputs":[
-    ["state"]
-  ],
-  "NetworkVariableGroups":{
-    "Classifier":["Shared"]
   }
-  }
+}

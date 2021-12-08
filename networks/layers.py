@@ -5,7 +5,7 @@ Primary layer function that handles identifying which layers to use when buildin
 import tensorflow as tf
 import tensorflow.keras.layers as KL
 import json
-import .customLayers import *
+from .customLayers import *
 import tensorflow.keras.backend as K
 
 

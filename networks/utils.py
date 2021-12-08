@@ -24,6 +24,7 @@ def LoadJSONFile(fileName):
         # raise
     with open(fileName) as json_file:
         data = json.load(json_file)
+    return data
 
 
 def UpdateStringValues(d, u):

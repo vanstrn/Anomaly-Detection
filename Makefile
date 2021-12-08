@@ -18,8 +18,8 @@ dev:
 	$(call run_command,bash)
 
 tensorboard:
-	docker run -it --rm --name tensorboard \
-		--memory="4G" --memory-swap="15G" \
+	docker run -it --rm \
+		--memory="4G" \
 		--network=host \
 		-v ${PWD}:${PWD} \
 		-w ${PWD} \

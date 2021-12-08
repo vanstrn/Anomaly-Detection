@@ -9,8 +9,8 @@ from tensorflow import keras
 from pprint import pformat
 import os
 
-from layers import GetLayer
-from utils import *
+from .layers import GetLayer
+from .utils import *
 
 import logging
 
@@ -41,12 +41,12 @@ def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, tr
     networkConfig = LoadJSONFile(networkConfigFile)
 
     #Creating Recursion sweep to go through dictionaries and lists in the networkConfig to insert user defined values.
-    if "DefaultParams" in data.keys():
-        variableFinal = data["DefaultParams"]
+    if "DefaultParams" in networkConfig.keys():
+        variableFinal = networkConfig["DefaultParams"]
         variableFinal.update(variables)
     else:
         variableFinal = variables
-    data["NetworkStructure"] = UpdateStringValues(data["NetworkStructure"],variableFinal)
+    networkConfig["NetworkStructure"] = UpdateStringValues(networkConfig["NetworkStructure"],variableFinal)
 
     inputs = {}
     outputs = {}
@@ -56,14 +56,14 @@ def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, tr
     logging.debug("Beginning creation of Network defined by: {}".format(networkConfigFile))
     #Creating All of the inputs
     logging.debug("Defining all inputs for the NN")
-    for name_i,input_i in observationSpec.spaces.items():
+    for name_i,input_i in observationSpec.items():
         logging.debug("Building Input: {}".format(name_i))
-        tmp = keras.Input(input_i.shape,name=name_i)
+        tmp = keras.Input(input_i,name=name_i)
         inputs[name_i] = tmp
         interOutputs["input."+name_i] = tmp
 
     logging.debug("Beginning Creation of network Layers")
-    for sectionName,layerList in data["NetworkStructure"].items():
+    for sectionName,layerList in networkConfig["NetworkStructure"].items():
         for layerDict in layerList:
             logging.debug("Building Layer: {}".format(layerDict["layerName"]))
 

@@ -2,9 +2,9 @@ import tensorflow as tf
 
 from utils.utils import GetFunction
 
-def LoadMethod(settingDict,**kwargs):
+def LoadMethod(settingDict,dataset,**kwargs):
     Method = GetFunction(settingDict["Method"])
-    net = Method(settingDict)
+    net = Method(settingDict,dataset,**kwargs)
     return net
 
 def GetOptimizer(optimizer,learningRate):

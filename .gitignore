@@ -1,3 +1,5 @@
+#Other custom stuff
+.tags*
 # Ignoring trained models and training logs
 logs/
 models/

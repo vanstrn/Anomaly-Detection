@@ -1,21 +1,26 @@
 
-from utils.utils import CheckFilled
 import numpy as np
 import tensorflow as tf
+import logging
 
-class BasicClassifier():
-    def __init__(self,settingsDict):
+from utils.utils import CheckFilled
+from methods.utils import GetOptimizer
+from networks.networkKeras import CreateModel
+from .BaseMethod import BaseMethod
+
+
+class BasicClassifier(BaseMethod):
+    def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
+        self.logger = logging.getLogger('method.Classic.PPO')
 
-        self.HPs = {"eps":0.2,
-                        "EntropyBeta":0.01,
-                        "CriticBeta":1.0,
-                        "LearningRate":0.00005,
-                        "Optimizer":"Adam",
-                        "Epochs":10,
-                        "BatchSize":1024,
-                        "MinibatchSize":64
-                         }
+        self.HPs = {
+                    "LearningRate":0.00005,
+                    "Optimizer":"Adam",
+                    "Epochs":10,
+                    "BatchSize":64,
+                    "Shuffle":True,
+                     }
 
         self.requiredParams = ["NetworkConfig",
                           ]
@@ -25,51 +30,34 @@ class BasicClassifier():
         self.HPs.update(settingsDict["NetworkHPs"])
 
         #Processing Other inputs
-        self.InitTF1()
+        self.opt = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        networkConfig.update(dataset.outputSpec)
+        self.Model = CreateModel(self.HPs["NetworkConfig"],dataset.inputSpec,variables=networkConfig)
+        self.Model.compile(optimizer=self.opt, loss=["mse"],metrics=['accuracy'])
+        self.Model.summary(print_fn=logging.info)
 
+        self.LoadModel({"modelPath":"models/Test"})
 
-    def Train(self,data):
-        self.TrainTF1(data)
+    def Train(self,data,callbacks=[]):
 
+        self.Model.fit( data["x_train"],
+                        data["y_train"],
+                        epochs=self.HPs["Epochs"],
+                        batch_size=self.HPs["BatchSize"],
+                        shuffle=self.HPs["Shuffle"],
+                        callbacks=callbacks)
+        self.SaveModel("models/Test")
 
-    def InitTF1(self):
-
-        with tf.device("/cpu:0"):
-            #Setting up the model
-            from networks.NetworkTF1 import buildNetwork
-            netConfigOverride={}
-            self.Model = buildNetwork(configFile=self.HPs["NetworkConfig"],netConfigOverride=netConfigOverride)
-
-
-    def TrainTF1(self,data):
-        with tf.device("/cpu:0"):
-            if self.HPs["Optimizer"] == "Adam":
-                opt = tf.keras.optimizers.Adam(self.HPs["LearningRate"])
-            elif self.HPs["Optimizer"] == "RMS":
-                opt = tf.keras.optimizers.RMSprop(self.HPs["LearningRate"])
-            elif self.HPs["Optimizer"] == "Adagrad":
-                opt = tf.keras.optimizers.Adagrad(self.HPs["LearningRate"])
-            elif self.HPs["Optimizer"] == "Adadelta":
-                opt = tf.keras.optimizers.Adadelta(self.HPs["LearningRate"])
-            elif self.HPs["Optimizer"] == "Adamax":
-                opt = tf.keras.optimizers.Adamax(self.HPs["LearningRate"])
-            elif self.HPs["Optimizer"] == "Nadam":
-                opt = tf.keras.optimizers.Nadam(self.HPs["LearningRate"])
-            elif self.HPs["Optimizer"] == "SGD":
-                opt = tf.keras.optimizers.SGD(self.HPs["LearningRate"])
-            elif self.HPs["Optimizer"] == "SGD-Nesterov":
-                opt = tf.keras.optimizers.SGD(self.HPs["LearningRate"],nesterov=True)
-            elif self.HPs["Optimizer"] == "Amsgrad":
-                opt = tf.keras.optimizers.Adam(self.HPs["LearningRate"],amsgrad=True)
-
-
-            self.Model[0].compile(optimizer=opt, loss=["mse"])
-
-            targets = np.vstack(data[1]).reshape(-1)
-            labels = np.eye(10)[targets]
-
-            self.Model[0].fit( [np.expand_dims(np.stack(data[0]),3)],
-                            [labels],
-                            epochs=self.HPs["Epochs"],
-                            batch_size=self.HPs["BatchSize"],
-                            shuffle=True,)
+    def Test(self,data):
+        count = 0
+        for i in range(0,data["x_test"].shape[0],self.HPs["BatchSize"]):
+            if i + self.HPs["BatchSize"] > data["x_test"].shape[0]:
+                pred = self.Model(np.expand_dims(data["x_test"][i:,:,:],-1))
+                realFinal = tf.math.argmax(data["y_test"][i:,:],axis=-1)
+            else:
+                pred = self.Model(np.expand_dims(data["x_test"][i:i+self.HPs["BatchSize"],:,:],-1))
+                realFinal = tf.math.argmax(data["y_test"][i:i+self.HPs["BatchSize"],:],axis=-1)
+            predFinal = tf.math.argmax(pred['Classifier'],axis=-1)
+            count += tf.reduce_sum(tf.cast(tf.math.equal(realFinal,predFinal),dtype=tf.float32))
+        print(count,data["x_test"].shape[0])
+        print(count/data["x_test"].shape[0])
