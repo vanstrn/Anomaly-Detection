@@ -5,7 +5,7 @@
   },
 
   "Method":"methods.Autoencoder.Autoencoder",
-  "Dataset":{ "Name":"MNIST_RECON",
+  "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
   "Callbacks":[

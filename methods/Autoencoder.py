@@ -44,8 +44,8 @@ class Autoencoder(BaseMethod):
 
     def Train(self,data,callbacks=[]):
         self.InitializeCallbacks(callbacks)
-        self.Model.fit( data["x_train"],
-                        data["x_train"],
+        self.Model.fit( data["image"],
+                        data["image"],
                         epochs=self.HPs["Epochs"],
                         batch_size=self.HPs["BatchSize"],
                         shuffle=self.HPs["Shuffle"],
