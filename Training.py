@@ -44,19 +44,24 @@ logger.RecordGitState()
 
 log.info("Running the expeiment with {}. CUDA_VISIBLE_DEVICES={}".format(args.processor,os.getenv("CUDA_VISIBLE_DEVICES")))
 
-dataset = LoadDataset(settings)
+try:
+    dataset = LoadDataset(settings)
 
-model = LoadMethod(settings,dataset,networkConfig=args.network)
+    model = LoadMethod(settings,dataset,networkConfig=args.network)
+    if args.train:
+        # Initialize Callbacks
+        callbacks=[]
+        if "Callbacks" in settings:
+            for dict in settings["Callbacks"]:
+                func = GetFunction(dict["Name"])
+                callbacks.append(func(logger,dataset,**dict["Arguments"]))
 
-if args.train:
-    # Initialize Callbacks
-    callbacks=[]
-    if "Callbacks" in settings:
-        for dict in settings["Callbacks"]:
-            func = GetFunction(dict["Name"])
-            callbacks.append(func(logger,dataset,**dict["Arguments"]))
+        model.Train(dataset.trainData,callbacks=callbacks)
 
-    model.Train(dataset.trainData,callbacks=callbacks)
-
-if args.test:
-    model.Test(dataset.testData)
+    if args.test:
+        model.Test(dataset.testData)
+except Exception as e:
+    log.warning("Closing environment due to error")
+    log.error('Error', exc_info=e)
+except KeyboardInterrupt:
+    log.warning("Closing environment due to Keyboard Interrupt")
