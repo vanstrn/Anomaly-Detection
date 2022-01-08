@@ -1,0 +1,6 @@
+#!/bin/bash
+
+vision() {
+  echo $@
+  docker run -d --rm -u `id -u`:`id -g` --gpus all --network=host -v ${PWD}:${PWD} -w ${PWD} vision-tf2 $@
+}

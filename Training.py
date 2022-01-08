@@ -1,36 +1,33 @@
 
 import argparse
 import tensorflow as tf
+import os
 import json
-from urllib.parse import unquote
-
+import logging
 from utils.utils import LoadConfig,CreatePath,GetFunction,UpdateNestedDictionary
-from datasets.utils import LoadDataset
+from utils.utils import LoadDataset,Logger,JSON_Load
 from methods.utils import LoadMethod
-from utils.git import SaveCurrentGitState
+
+log = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-b", "--backend", required=False, default="Tensorflow1",
-                    help="Specify which NN backend to use.",
-                    choices=["Tensorflow1" , "Tensorflow2" , "PyTorch"])
 parser.add_argument("-f", "--configFile", required=True,
                     help="Filename or filepath to be run.")
-parser.add_argument("-c", "--config", required=False, default=None,
+parser.add_argument("-c", "--config", required=False, default={}, action=JSON_Load,
                     help="Specify overrides to be made to the run.")
-parser.add_argument("-n", "--network", required=False, default=None,
+parser.add_argument("-n", "--network", required=False, default={}, action=JSON_Load,
                     help="Specify special parameters for the network.")
 parser.add_argument("-p", "--processor", required=False, default="gpu0",
                     help="Processor identifier string. [cpu / gpu0 / gpu1]")
-
+parser.add_argument("--train", required=False, default=True,
+                    action="store_false",help="Flag to skip training")
+parser.add_argument("--test", required=False, default=True,
+                    action="store_false",help="Flag to skip testing")
 args = parser.parse_args()
-if args.config is not None: configOverride = json.loads(unquote(args.config))
-else: configOverride = {}
-if args.network is not None: networkVariables = json.loads(unquote(args.network))
-else: networkVariables = {}
 
 #Reading in the config files.
 settings = LoadConfig(args.configFile)
-settings = UpdateNestedDictionary(settings,configOverride)
+settings = UpdateNestedDictionary(settings,args.config)
 
 #Setting up tensorflow based on specified processor configur
 if "gpu" in args.processor:
@@ -39,35 +36,27 @@ if "gpu" in args.processor:
         tf.config.experimental.set_memory_growth(gpu, True)
 else:
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-# logger.info("Running the expeiment with {}. CUDA_VISIBLE_DEVICES={}".format(args.processor,os.getenv("CUDA_VISIBLE_DEVICES")))
 tf.keras.backend.set_floatx('float32')
 
 #Creating specific save folders for the different
-EXP_NAME = settings["RunName"]
-MODEL_PATH = './models/'+EXP_NAME
-LOG_PATH = './logs/'+EXP_NAME
-CreatePath(LOG_PATH)
-CreatePath(MODEL_PATH)
+logger = Logger('./logs/'+settings["RunName"])
+logger.RecordGitState()
 
-#Saving Current Git Status for replication purposes.
-SaveCurrentGitState(LOG_PATH)
+log.info("Running the expeiment with {}. CUDA_VISIBLE_DEVICES={}".format(args.processor,os.getenv("CUDA_VISIBLE_DEVICES")))
 
-########## Loading the DataSet ########
 dataset = LoadDataset(settings)
 
-print(dataset)
-#Loading the Model
-model = LoadMethod(settings,dataset,networkConfig=networkVariables)
+model = LoadMethod(settings,dataset,networkConfig=args.network)
 
-# Initialize Callbacks
-callbacks=[]
-if "Callbacks" in settings:
-    for dict in settings["Callbacks"]:
-        func = GetFunction(dict["Name"])
-        callbacks.append(func(LOG_PATH,dataset,**dict["Arguments"]))
+if args.train:
+    # Initialize Callbacks
+    callbacks=[]
+    if "Callbacks" in settings:
+        for dict in settings["Callbacks"]:
+            func = GetFunction(dict["Name"])
+            callbacks.append(func(logger,dataset,**dict["Arguments"]))
 
-print(callbacks)
-########## Training ############################################################
-model.Train(dataset.trainData,callbacks=callbacks)
+    model.Train(dataset.trainData,callbacks=callbacks)
 
-model.Test(dataset.testData)
+if args.test:
+    model.Test(dataset.testData)

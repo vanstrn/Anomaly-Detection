@@ -8,11 +8,11 @@ from methods.utils import GetOptimizer
 from networks.networkKeras import CreateModel
 from .BaseMethod import BaseMethod
 
+log = logging.getLogger(__name__)
 
-class BasicClassifier(BaseMethod):
+class Classifier(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
-        self.logger = logging.getLogger('method.Classic.PPO')
 
         self.HPs = {
                     "LearningRate":0.00005,
@@ -34,7 +34,7 @@ class BasicClassifier(BaseMethod):
         networkConfig.update(dataset.outputSpec)
         self.Model = CreateModel(self.HPs["NetworkConfig"],dataset.inputSpec,variables=networkConfig)
         self.Model.compile(optimizer=self.opt, loss=["mse"],metrics=['accuracy'])
-        self.Model.summary(print_fn=logging.info)
+        self.Model.summary(print_fn=log.info)
 
         self.LoadModel({"modelPath":"models/Test"})
 

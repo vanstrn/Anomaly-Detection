@@ -1,3 +1,4 @@
-from .mnist import MNIST_Basic
-def LoadDataset(*args,**kwargs):
-    return MNIST_Basic()
+import numpy as np
+
+def NormalizeImages(images):
+    return (images.astype(float) / 127.5) - 1

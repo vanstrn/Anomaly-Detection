@@ -1,13 +1,16 @@
 { "RunName":"Test",
   "NetworkHPs":{
-    "NetworkConfig":"netConfigs/BasicClassifier/BasicClassifier.json",
+    "NetworkConfig":"netConfigs/Classifiers/BasicClassifier.json",
     "Epochs":1
   },
 
-  "Method":"methods.BasicClassifier.BasicClassifier",
+  "Method":"methods.Classifier.Classifier",
+
+  "Dataset":{ "Name":"MNIST_Basic",
+              "Arguments":{}},
 
   "Callbacks":[
-    {"Name":"utils.callbacks.TensorboardCallback",
+    {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}}
     ]
 

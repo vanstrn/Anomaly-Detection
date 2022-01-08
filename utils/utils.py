@@ -3,10 +3,23 @@
 import numpy as np
 import os
 from importlib import import_module #Used to import module based on a string.
-import inspect
-import functools
+from urllib.parse import unquote
 import collections.abc
 import json
+from datasets import *
+import logging
+import tensorflow as tf
+from utils.git import SaveCurrentGitState
+import argparse
+import matplotlib.pyplot as plt
+
+class JSON_Load(argparse.Action):
+    def __init__(self, option_strings, dest, **kwargs):
+        super(JSON_Load, self).__init__(option_strings,dest, **kwargs)
+    def __call__(self, parser, namespace, values, option_string=None):
+        jsonDict = json.loads(unquote(values))
+        setattr(namespace, self.dest, jsonDict)
+
 
 def LoadConfig(targetFileName,**kwargs):
     for (dirpath, dirnames, filenames) in os.walk("runConfigs"):
@@ -65,3 +78,68 @@ def CreatePath(path, override=False):
             os.makedirs(path)
         except OSError:
             raise OSError("Creation of the directory {} failed".format(path))
+
+
+def LoadDataset(settings,**kwargs):
+    func = eval(settings["Dataset"]["Name"])
+    return func(**settings["Dataset"]["Arguments"])
+
+
+class Logger():
+    def __init__(self, LOG_PATH):
+        self.LOG_PATH = LOG_PATH
+
+        CreatePath(LOG_PATH)
+        CreatePath(LOG_PATH+'/images')
+        CreatePath(LOG_PATH+'/tb_logs')
+
+        self.writer = tf.summary.create_file_writer(LOG_PATH+'/tb_logs')
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s %(message)s',
+            handlers=[
+                logging.StreamHandler(),
+                logging.FileHandler(LOG_PATH + '/logger.log'),
+                ],
+            datefmt='%Y/%m/%d %I:%M:%S %p'
+            )
+
+    def LogScalar(self, tag,value,step):
+        with self.writer.as_default():
+            summary = tf.summary.scalar(tag,value,step=tf.cast(step, tf.int64))
+        self.writer.flush()
+
+    def SaveImage(self,name,format="png"):
+        plt.savefig("{}/images/{}.{}".format(self.LOG_PATH,name,format))
+        plt.close()
+
+    def LogImage(self,image,name,step):
+        with self.writer.as_default():
+            summary = tf.summary.image(name, image, step=step)
+        self.writer.flush()
+
+    def LogMatplotLib(self,figure,name,step):
+        with self.writer.as_default():
+            summary = tf.summary.image(name, plot_to_image(figure), step=step)
+        self.writer.flush()
+
+    def RecordGitState(self):
+        SaveCurrentGitState(self.LOG_PATH)
+
+import io
+
+def plot_to_image(figure):
+  """Converts the matplotlib plot specified by 'figure' to a PNG image and
+  returns it. The supplied figure is closed and inaccessible after this call."""
+  # Save the plot to a PNG in memory.
+  buf = io.BytesIO()
+  plt.savefig(buf, format='png')
+  # Closing the figure prevents it from being displayed directly inside
+  # the notebook.
+  plt.close(figure)
+  buf.seek(0)
+  # Convert PNG buffer to TF image
+  image = tf.image.decode_png(buf.getvalue(), channels=4)
+  # Add the batch dimension
+  image = tf.expand_dims(image, 0)
+  return image

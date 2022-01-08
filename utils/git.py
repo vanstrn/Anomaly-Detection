@@ -1,13 +1,14 @@
 
-"""Required packages:
+"""
+Required packages:
     GitPython - `pip install gitpython`
 """
 import git
-from .utils import CreatePath
 from shutil import copyfile
 
 def GetCurrentCommitHash(repo):
     return repo.head.object.hexsha
+
 
 def GetCurrentBranch(repo):
     return repo.active_branch
@@ -16,7 +17,6 @@ def GetCurrentBranch(repo):
 def SaveCurrentGitState(saveLocation,saveUntrackedFiles=False):
     #Creating a path to sace untracked files.
     repo = git.Repo()
-    CreatePath(saveLocation)
     repoDifferences,untrackedFiles = GetCurrentGitState(repo)
     file = open(saveLocation+"/git_status.txt", "w")
     file.write("Current branch: "+str(GetCurrentBranch(repo))+"\n")
@@ -32,7 +32,9 @@ def SaveCurrentGitState(saveLocation,saveUntrackedFiles=False):
     file.write(repoDifferences)
     #Copying untracked files
     if saveUntrackedFiles:
-        CreatePath(saveLocation+"/untrackedFiles")
+        dst = saveLocation+"/untrackedFiles"
+        if not os.path.exists(dst):
+                os.makedirs(dst)
         for files in untrackedFiles:
             copyfile(files, dst)
     file.close()
@@ -50,6 +52,7 @@ def GetCurrentGitState(repo):
     repoDifferences = repo.git.diff()
 
     return repoDifferences,untrackedFiles
+
 
 def GetCurrentGitSummary(repo):
     """Returns a two lists showing the names of dirty and untracked files."""

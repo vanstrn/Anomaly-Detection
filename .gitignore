@@ -3,6 +3,7 @@
 # Ignoring trained models and training logs
 logs/
 models/
+test*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,24 @@
+{ "RunName":"AE",
+  "NetworkHPs":{
+    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
+    "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
+    "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
+    "Epochs":25
+  },
+
+  "Method":"methods.GANomaly.GANomaly",
+  "Dataset":{ "Name":"MNIST_Anomaly",
+              "Arguments":{}},
+
+  "Callbacks":[
+    {"Name":"utils.callbacks.LogTraining",
+      "Arguments":{}},
+    {"Name":"methods.GAN.TestGenerator",
+      "Arguments":{}},
+    {"Name":"methods.Autoencoder.TestReconstruction",
+      "Arguments":{}},
+    {"Name":"methods.Autoencoder.TestAnomaly",
+      "Arguments":{}}
+    ]
+
+  }

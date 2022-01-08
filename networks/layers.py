@@ -48,6 +48,10 @@ def GetLayer(layerDict):
         layer = KL.Dropout(**layerDict["Parameters"],name=layerDict["layerName"])
     elif layerDict["layerType"] == "ZeroPadding2D":
         layer = KL.ZeroPadding2D(**layerDict["Parameters"],name=layerDict["layerName"])
+    elif layerDict["layerType"] == "BatchNormalization":
+        layer = KL.BatchNormalization(**layerDict["Parameters"],name=layerDict["layerName"])
+    elif layerDict["layerType"] in ["LeakyReLU","LeakyRelu"]:
+        layer = KL.LeakyReLU(**layerDict["Parameters"],name=layerDict["layerName"])
 
     #Weird Math Layers
     elif layerDict["layerType"] == "LogSoftMax":
@@ -82,5 +86,13 @@ def GetLayer(layerDict):
         layer= BasicCNNSplit( **layerDict["Parameters"],name=layerDict["layerName"])
     elif layerDict["layerType"] == "ChannelFilter":
         layer= ChannelFilter( **layerDict["Parameters"],name=layerDict["layerName"])
+    elif layerDict["layerType"] == "SamplingLike":
+        layer = SamplingLike(**layerDict["Parameters"],name=layerDict["layerName"])
+    elif layerDict["layerType"] == "Sampling":
+        layer = Sampling(**layerDict["Parameters"],name=layerDict["layerName"])
+    elif layerDict["layerType"] == "CentralCropping2D":
+        layer= CentralCropping2D( **layerDict["Parameters"],name=layerDict["layerName"])
+
+
 
     return layer
