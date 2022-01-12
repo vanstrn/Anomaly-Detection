@@ -1,4 +1,10 @@
+"""Implementation of Generative Adversarial Networks, first proposed in
+https://arxiv.org/abs/1406.2661
 
+If a convolutional network is used then it would be equivalent to
+"DEEP CONVOLUTIONAL GENERATIVE ADVERSARIAL NETWORKS" (ICLR 2016)
+https://arxiv.org/abs/1511.06434
+ """
 import numpy as np
 import tensorflow as tf
 import logging
