@@ -5,6 +5,7 @@ define run_command
 			--memory="10G" --memory-swap="15G" \
 			--network=host \
 			-v ${PWD}:${PWD} \
+			-v ~/.keras:/.keras \
 			-w ${PWD} \
 			vision-tf2 \
 			$(1)
