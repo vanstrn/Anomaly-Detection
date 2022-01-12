@@ -105,26 +105,3 @@ class BiGAN(BaseMethod):
 
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)
-
-
-class TestGenerator(tf.keras.callbacks.Callback):
-    def __init__(self,logger,dataset,dx=5,dy=5):
-        super(TestGenerator, self).__init__()
-        self.logger=logger
-        self.dataset=dataset
-        self.dx=dx
-        self.dy=dy
-
-    def on_epoch_end(self, epoch, logs=None):
-        """Plotting and saving several test images to specified directory. """
-
-        #Selecting a random subset of images to plot.
-        latentSample = tf.random.normal([int(self.dx*self.dy), self.model.HPs["LatentSize"]])
-        #
-        out = self.model.ImagesFromLatent(latentSample)
-        x = out["Decoder"].reshape([self.dx,self.dy]+list(out["Decoder"].shape[1:]))
-        x2 = np.concatenate(np.split(x,self.dx,axis=0),axis=2)
-        x3 = np.squeeze(np.concatenate(np.split(x2,self.dy,axis=1),axis=3))
-
-
-        self.logger.LogImage(np.expand_dims(x3,axis=(0,-1)),"Generator",epoch)
