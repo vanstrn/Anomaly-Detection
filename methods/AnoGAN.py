@@ -19,7 +19,7 @@ class AnoGAN(GAN):
         """Initializing Model and all Hyperparameters """
 
         super().__init__(settingsDict,dataset,networkConfig)
-        self.HPs.update({"AnomalyFitEpochs":10,"LatentNetworkConfig":"netConfigs/GAN/Encoder.json"})
+        self.HPs.update({"PredBatchSize":16,"AnomalyFitEpochs":10,"LatentNetworkConfig":"netConfigs/GAN/Encoder.json"})
 
     def GenerateLatent(self,sample):
         #Building the latent network
@@ -44,7 +44,7 @@ class AnoGAN(GAN):
         imagePred = np.zeros_like(sample)
         #Spliting data into appropriate batches and running them through the things
         i=0
-        testDataset = tf.data.Dataset.from_tensor_slices(sample).batch(self.HPs["BatchSize"])
+        testDataset = tf.data.Dataset.from_tensor_slices(sample).batch(self.HPs["PredBatchSize"])
         for batch in testDataset:
             z = self.GenerateLatent(batch)
             tmp = tf.squeeze(self.Generator.predict(z)["Decoder"])
