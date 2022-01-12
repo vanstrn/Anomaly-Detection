@@ -1,5 +1,8 @@
-""" Implementation of BiGAN from "Adversarial Feature Learning (ICLR 2017)
+""" Implementation of BiGAN from "Adversarial Feature Learning" (ICLR 2017)
 https://arxiv.org/abs/1605.09782
+
+This method is also the same as "Adversarially Learned Inference" (ICLR 2017):
+https://arxiv.org/abs/1606.00704
 
 Method Description: TBD
 """
