@@ -1,4 +1,4 @@
-{ "RunName":"BiGAN",
+{ "RunName":"BiGAN_AD_1",
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/BiGAN_Discriminator.json",
@@ -6,14 +6,16 @@
     "Epochs":25
   },
 
-  "Method":"methods.BiGAN.BiGAN",
-  "Dataset":{ "Name":"MNIST_RECON",
+  "Method":"methods.BiGAN.BIGAN",
+  "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"methods.GAN.TestGenerator",
+      "Arguments":{}},
+    {"Name":"methods.Autoencoder.TestAnomaly",
       "Arguments":{}}
     ]
 

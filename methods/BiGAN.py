@@ -4,6 +4,9 @@ https://arxiv.org/abs/1605.09782
 This method is also the same as "Adversarially Learned Inference" (ICLR 2017):
 https://arxiv.org/abs/1606.00704
 
+When used for anomaly detection it becomes "Efficient GAN-Based Anomaly Detection" (arxiv 2018 / Workshop ICLR 2018):
+https://arxiv.org/abs/1802.06222
+
 Method Description: TBD
 """
 import numpy as np
@@ -108,3 +111,17 @@ class BiGAN(BaseMethod):
 
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)
+
+    def ImagesFromImage(self,testImages):
+        z = self.Encoder.predict({"image":testImages})["Latent"]
+        return self.Generator.predict({"latent":z})["Decoder"]
+
+    def ImageDiscrim(self,testImages):
+        z = self.Encoder.predict({"image":testImages})["Latent"]
+        return self.Discriminator.predict({"image":testImages,"features":z})["Discrim"]
+
+    def AnomalyScore(self,testImages,alpha=0.9):
+        v1 = tf.reduce_sum((testImages-tf.squeeze(self.ImagesFromImage(testImages)))**2,axis=[1,2])
+        v2 = tf.squeeze(self.ImageDiscrim(testImages))
+        alpha=0.9
+        return alpha * v1 + (1-alpha)*v2
