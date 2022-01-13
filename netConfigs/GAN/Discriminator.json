@@ -40,7 +40,7 @@
         "layerInput":"Dense1",
         "Output":true,
         "Parameters":{"units":1,
-                      "activation":null}}
+                      "activation":"sigmoid"}}
 
     ]
   }
