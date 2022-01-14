@@ -76,7 +76,7 @@ class BiGAN(BaseMethod):
             print("End Epoch {}: Time {}".format(epoch,time.time()-ts))
         self.ExecuteTrainEndCallbacks({})
 
-    # @tf.function
+    @tf.function
     def train_step(self,images):
         noise = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
