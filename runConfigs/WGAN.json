@@ -1,0 +1,19 @@
+{ "RunName":"WGAN",
+  "NetworkHPs":{
+    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
+    "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
+    "Epochs":200
+  },
+
+  "Method":"methods.WGAN.WGAN",
+  "Dataset":{ "Name":"MNIST_RECON",
+              "Arguments":{}},
+
+  "Callbacks":[
+    {"Name":"utils.callbacks.LogTraining",
+      "Arguments":{}},
+    {"Name":"methods.GAN.TestGenerator",
+      "Arguments":{}}
+    ]
+
+  }
