@@ -123,5 +123,4 @@ class BiGAN(BaseMethod):
     def AnomalyScore(self,testImages,alpha=0.9):
         v1 = tf.reduce_sum((testImages-tf.squeeze(self.ImagesFromImage(testImages)))**2,axis=[1,2])
         v2 = tf.squeeze(self.ImageDiscrim(testImages))
-        alpha=0.9
         return alpha * v1 + (1-alpha)*v2
