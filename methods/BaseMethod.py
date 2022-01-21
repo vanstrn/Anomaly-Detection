@@ -1,18 +1,45 @@
 import tensorflow as tf
 import logging
+from methods.utils import Requirements
+import time
 
 log = logging.getLogger(__name__)
 
 class BaseMethod():
+    HPs = { "BatchSize":32,
+            "ShuffleData":True,
+            "ShuffleSize":10000,
+            "DropRemainder":False,
+            }
+    requiredParams = Requirements()
 
-    def __init__():
-        pass
+    def __init__(self, settingsDict, *args, **kwargs):
+        #Initializing
+        #Chacking Valid hyperparameters are specified
+        self.requiredParams.Check(settingsDict["NetworkHPs"])
+        self.HPs.update(settingsDict["NetworkHPs"])
 
-    def Train():
-        raise NotImplementedError
 
-    def Test():
-        raise NotImplementedError
+    def SetupDataset(self,data):
+        dataset = tf.data.Dataset.from_tensor_slices(data)
+        if self.HPs["ShuffleData"]:
+            dataset = dataset.shuffle(self.HPs["ShuffleSize"])
+        return dataset.batch(self.HPs["BatchSize"],self.HPs["DropRemainder"])
+
+    def Train(self,data,callbacks=[]):
+        self.InitializeCallbacks(callbacks)
+        train_dataset = self.SetupDataset(data)
+        for epoch in range(self.HPs["Epochs"]):
+            ts = time.time()
+
+            for batch in train_dataset:
+                info = self.train_step(batch)
+            self.ExecuteEpochEndCallbacks(epoch,info)
+            log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
+        self.ExecuteTrainEndCallbacks({})
+
+    def Test(self):
+        self.ExecuteTrainEndCallbacks({})
 
     def SaveModel(self,modelPath):
         """Saves model in specified folder. Assumes """
@@ -56,3 +83,8 @@ class BaseMethod():
 
     def set_weights(self):
         pass
+
+if __name__ == "__main__":
+    testMethod = BaseMethod()
+    print(dir(BaseMethod))
+    print(BaseMethod.HPs)

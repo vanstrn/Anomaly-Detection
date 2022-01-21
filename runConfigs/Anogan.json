@@ -2,6 +2,7 @@
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
+    "LatentNetworkConfig":"netConfigs/GAN/Encoder.json",
     "Epochs":25
   },
 

@@ -8,10 +8,8 @@ provides an alternative implementation, and a more in depth summary of the metho
 import numpy as np
 import tensorflow as tf
 import logging
-import matplotlib.pyplot as plt
 import time
 
-from utils.utils import CheckFilled
 from methods.utils import GetOptimizer
 from networks.networkKeras import CreateModel
 from .BaseMethod import BaseMethod
@@ -24,34 +22,27 @@ class WGAN(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
 
-        self.HPs = {
+        self.HPs.update({
                     "LearningRate":0.00005,
                     "LatentSize":64,
                     "Optimizer":"RMS",
                     "Epochs":10,
-                    "BatchSize":32,
-                    "Shuffle":True,
                     "DiscrimClipValue":0.01,
                     "GenUpdateFreq":5,
-                     }
+                     })
 
-        self.requiredParams = [ "GenNetworkConfig",
-                                "DiscNetworkConfig",
-                                ]
+        self.requiredParams.Append([
+                "GenNetworkConfig",
+                "DiscNetworkConfig",
+                ])
 
-        #Chacking Valid hyperparameters are specified
-        CheckFilled(self.requiredParams,settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
+        super().__init__(settingsDict)
 
         #Processing Other inputs
         self.inputSpec=dataset.inputSpec
         networkConfig.update(dataset.outputSpec)
-        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig)
-        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig)
-
-        # self.LoadModel({"modelPath":"models/TestVAE"})
-        self.Generator.summary(print_fn=log.info)
-        self.Discriminator.summary(print_fn=log.info)
+        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig,printSummary=True)
+        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
 
         self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
@@ -112,36 +103,5 @@ class WGAN(BaseMethod):
         for params in self.Discriminator.variables:
             params.assign(tf.clip_by_value(params,-self.HPs["DiscrimClipValue"],self.HPs["DiscrimClipValue"]))
 
-    def Test(self,data):
-        pass
-
-    def InitializeCallbacks(self,callbacks):
-        """Method initializes callbacks for training loops that are not `model.fit()`.
-        Additional logic is still required for methods with multiple networks, such as GANs."""
-        self.callbacks = tf.keras.callbacks.CallbackList(callbacks,model=self)
-
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)
-
-
-class TestGenerator(tf.keras.callbacks.Callback):
-    def __init__(self,logger,dataset,dx=5,dy=5):
-        super(TestGenerator, self).__init__()
-        self.logger=logger
-        self.dataset=dataset
-        self.dx=dx
-        self.dy=dy
-
-    def on_epoch_end(self, epoch, logs=None):
-        """Plotting and saving several test images to specified directory. """
-
-        #Selecting a random subset of images to plot.
-        latentSample = tf.random.normal([int(self.dx*self.dy), self.model.HPs["LatentSize"]])
-        #
-        out = self.model.ImagesFromLatent(latentSample)
-        x = out["Decoder"].reshape([self.dx,self.dy]+list(out["Decoder"].shape[1:]))
-        x2 = np.concatenate(np.split(x,self.dx,axis=0),axis=2)
-        x3 = np.squeeze(np.concatenate(np.split(x2,self.dy,axis=1),axis=3))
-
-
-        self.logger.LogImage(np.expand_dims(x3,axis=(0,-1)),"Generator",epoch)

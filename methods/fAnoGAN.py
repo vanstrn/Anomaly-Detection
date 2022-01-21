@@ -85,44 +85,12 @@ class fAnoWGAN(fAnoGAN):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
 
-        self.HPs = {
-                    "LearningRate":0.00005,
-                    "LatentSize":64,
-                    "Optimizer":"Adam",
-                    "Epochs":10,
-                    "BatchSize":32,
-                    "Shuffle":True,
+        self.HPs.update({
                     "DiscrimClipValue":0.01,
                     "GenUpdateFreq":5,
-                     }
+                     })
 
-        self.requiredParams = [ "GenNetworkConfig",
-                                "DiscNetworkConfig",
-                                "EncNetworkConfig",
-                                ]
-
-        #Chacking Valid hyperparameters are specified
-        CheckFilled(self.requiredParams,settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
-
-        #Processing Other inputs
-        self.inputSpec=dataset.inputSpec
-        self.opt = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        networkConfig.update(dataset.outputSpec)
-        networkConfig.update({"LatentSize":self.HPs["LatentSize"]})
-        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig)
-        self.Encoder = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig)
-        _datasetSpec = {"features":[self.HPs["LatentSize"]],**dataset.inputSpec}
-        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],_datasetSpec,variables=networkConfig)
-
-        # self.LoadModel({"modelPath":"models/TestVAE"})
-        self.Generator.summary(print_fn=log.info)
-        self.Discriminator.summary(print_fn=log.info)
-        self.Encoder.summary(print_fn=log.info)
-
-        self.generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-        self.discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
-        self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        super().__init__(settingsDict,dataset,networkConfig)
 
         self.counter=0
 

@@ -12,10 +12,7 @@ Method Description: TBD
 import numpy as np
 import tensorflow as tf
 import logging
-import matplotlib.pyplot as plt
-import time
 
-from utils.utils import CheckFilled
 from methods.utils import GetOptimizer
 from networks.networkKeras import CreateModel
 from .BaseMethod import BaseMethod
@@ -27,54 +24,36 @@ class BiGAN(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
 
-        self.HPs = {
+        self.HPs.update({
                     "LearningRate":0.00005,
                     "LatentSize":64,
                     "Optimizer":"Adam",
                     "Epochs":10,
                     "BatchSize":32,
                     "Shuffle":True,
-                     }
+                     })
 
-        self.requiredParams = [ "GenNetworkConfig",
-                                "DiscNetworkConfig",
-                                "EncNetworkConfig",
-                                ]
+        self.requiredParams.Append([
+            "GenNetworkConfig",
+            "DiscNetworkConfig",
+            "EncNetworkConfig",
+            ])
 
-        #Chacking Valid hyperparameters are specified
-        CheckFilled(self.requiredParams,settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
+        super().__init__(settingsDict)
 
         #Processing Other inputs
         self.inputSpec=dataset.inputSpec
         self.opt = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         networkConfig.update(dataset.outputSpec)
         networkConfig.update({"LatentSize":self.HPs["LatentSize"]})
-        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig)
-        self.Encoder = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig)
+        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig,printSummary=True)
+        self.Encoder = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
         _datasetSpec = {"features":[self.HPs["LatentSize"]],**dataset.inputSpec}
-        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],_datasetSpec,variables=networkConfig)
+        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],_datasetSpec,variables=networkConfig,printSummary=True)
 
-        # self.LoadModel({"modelPath":"models/TestVAE"})
-        self.Generator.summary(print_fn=log.info)
-        self.Discriminator.summary(print_fn=log.info)
-        self.Encoder.summary(print_fn=log.info)
-
-        self.generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-        self.discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+        self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-
-    def Train(self,data,callbacks=[]):
-        self.InitializeCallbacks(callbacks)
-        train_dataset = tf.data.Dataset.from_tensor_slices(data).batch(self.HPs["BatchSize"])
-        for epoch in range(self.HPs["Epochs"]):
-            ts = time.time()
-
-            for batch in train_dataset:
-                info = self.train_step(batch)
-            self.ExecuteEpochEndCallbacks(epoch,info)
-            print("End Epoch {}: Time {}".format(epoch,time.time()-ts))
-        self.ExecuteTrainEndCallbacks({})
 
     @tf.function
     def train_step(self,images):
@@ -100,14 +79,6 @@ class BiGAN(BaseMethod):
         self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
 
         return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss,"Encoder Loss": enc_loss}
-
-    def Test(self,data):
-        pass
-
-    def InitializeCallbacks(self,callbacks):
-        """Method initializes callbacks for training loops that are not `model.fit()`.
-        Additional logic is still required for methods with multiple networks, such as GANs."""
-        self.callbacks = tf.keras.callbacks.CallbackList(callbacks,model=self)
 
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)

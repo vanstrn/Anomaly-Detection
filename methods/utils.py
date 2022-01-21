@@ -1,6 +1,9 @@
 import tensorflow as tf
 
 from utils.utils import GetFunction
+import logging
+
+log = logging.getLogger(__name__)
 
 def LoadMethod(settingDict,dataset,**kwargs):
     Method = GetFunction(settingDict["Method"])
@@ -30,3 +33,24 @@ def GetOptimizer(optimizer,learningRate):
         raise Exception("Invalid optimizer `{}` specified.".format(optimizer))
 
     return opt
+
+class Requirements():
+    def __init__(self):
+        self.requirements=set()
+
+    def Append(self,requirementList):
+        for requirement in requirementList:
+            self.requirements.add(requirement)
+
+    def Check(self,dictionary,fileName=None):
+        valid = True
+        for requiredParam in self.requirements:
+            if requiredParam not in dictionary:
+                valid = False
+                if fileName is not None:
+                    log.warning("Missing parameter/option: ***" + requiredParam +"*** in file: ***"+fileName+"***")
+                else:
+                    log.warning("Missing parameter/option: " + requiredParam )
+        if not valid:
+            log.error("Missing one or parameters specified above. Exiting")
+            raise ValueError("Missing one or parameters specified in logging. Exiting")

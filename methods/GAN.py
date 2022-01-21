@@ -8,10 +8,7 @@ https://arxiv.org/abs/1511.06434
 import numpy as np
 import tensorflow as tf
 import logging
-import matplotlib.pyplot as plt
-import time
 
-from utils.utils import CheckFilled
 from methods.utils import GetOptimizer
 from networks.networkKeras import CreateModel
 from .BaseMethod import BaseMethod
@@ -19,64 +16,43 @@ from .BaseMethod import BaseMethod
 log = logging.getLogger(__name__)
 
 
-
 class GAN(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
-        """Initializing Model and all Hyperparameters """
+        """Initializing Models for the method """
 
-        self.HPs = {
-                    "LearningRate":0.00005,
+        self.HPs.update({
+                    "LearningRate":0.0001,
                     "LatentSize":64,
                     "Optimizer":"Adam",
                     "Epochs":10,
-                    "BatchSize":32,
-                    "Shuffle":True,
-                     }
+                     })
 
-        self.requiredParams = [ "GenNetworkConfig",
-                                "DiscNetworkConfig",
-                                ]
+        self.requiredParams.Append([
+                "GenNetworkConfig",
+                "DiscNetworkConfig",
+                ])
 
-        #Chacking Valid hyperparameters are specified
-        CheckFilled(self.requiredParams,settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
+        super().__init__(settingsDict)
 
         #Processing Other inputs
         self.inputSpec=dataset.inputSpec
-        self.opt = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         networkConfig.update(dataset.outputSpec)
-        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig)
-        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig)
+        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig,printSummary=True)
+        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
 
-        # self.LoadModel({"modelPath":"models/TestVAE"})
-        self.Generator.summary(print_fn=log.info)
-        self.Discriminator.summary(print_fn=log.info)
-
-        self.generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-        self.discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+        self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-
-    def Train(self,data,callbacks=[]):
-        self.InitializeCallbacks(callbacks)
-        train_dataset = tf.data.Dataset.from_tensor_slices(data).batch(self.HPs["BatchSize"])
-        for epoch in range(self.HPs["Epochs"]):
-            ts = time.time()
-
-            for batch in train_dataset:
-                info = self.train_step(batch)
-            self.ExecuteEpochEndCallbacks(epoch,info)
-            print("End Epoch {}: Time {}".format(epoch,time.time()-ts))
-        self.ExecuteTrainEndCallbacks({})
 
     @tf.function
     def train_step(self,images):
         noise = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-            out = self.Generator(noise, training=True)
-            generated_images = {"image":out["Decoder"]}
+            generatedImages = self.Generator(noise, training=True)["Decoder"]
+
             real_output = self.Discriminator(images, training=True)["Discrim"]
-            fake_output = self.Discriminator(generated_images, training=True)["Discrim"]
+            fake_output = self.Discriminator({"image":generatedImages}, training=True)["Discrim"]
 
             gen_loss = self.cross_entropy(tf.ones_like(fake_output), fake_output)
             disc_loss = self.cross_entropy(tf.ones_like(real_output), real_output) + \
@@ -89,14 +65,6 @@ class GAN(BaseMethod):
         self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
 
         return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss}
-
-    def Test(self,data):
-        pass
-
-    def InitializeCallbacks(self,callbacks):
-        """Method initializes callbacks for training loops that are not `model.fit()`.
-        Additional logic is still required for methods with multiple networks, such as GANs."""
-        self.callbacks = tf.keras.callbacks.CallbackList(callbacks,model=self)
 
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)

@@ -18,8 +18,12 @@ class AnoGAN(GAN):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
 
+        self.HPs.update({
+            "PredBatchSize":16,
+            "AnomalyFitEpochs":10,
+            })
+        self.reqiurements.Append(["LatentNetworkConfig"])
         super().__init__(settingsDict,dataset,networkConfig)
-        self.HPs.update({"PredBatchSize":16,"AnomalyFitEpochs":10,"LatentNetworkConfig":"netConfigs/GAN/Encoder.json"})
 
     def GenerateLatent(self,sample):
         #Building the latent network

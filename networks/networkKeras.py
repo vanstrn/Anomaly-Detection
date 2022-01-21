@@ -13,9 +13,10 @@ from .layers import GetLayer
 from .utils import *
 
 import logging
+log = logging.getLogger(__name__)
 
 
-def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, training=True):
+def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, training=True, printSummary=False):
     """
     Reads a network config file and processes that into a netowrk with appropriate naming structure.
 
@@ -127,6 +128,9 @@ def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, tr
             #Adding the appropriate layers to the output.
 
     model = keras.Model(inputs,outputs,name=scope)
+
+    if printSummary:
+        model.summary(print_fn=log.info)
 
     return model
 

@@ -18,29 +18,24 @@ class Autoencoder(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
 
-        self.HPs = {
+        self.HPs.update({
                     "LearningRate":0.00005,
                     "Optimizer":"Adam",
                     "Epochs":10,
                     "BatchSize":64,
                     "Shuffle":True,
-                     }
+                     })
 
-        self.requiredParams = ["NetworkConfig",
-                          ]
+        self.requiredParams.Append(["NetworkConfig",
+                          ])
 
-        #Chacking Valid hyperparameters are specified
-        CheckFilled(self.requiredParams,settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
+        super().__init__(settingsDict)
 
         #Processing Other inputs
         self.opt = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         networkConfig.update(dataset.outputSpec)
-        self.Model = CreateModel(self.HPs["NetworkConfig"],dataset.inputSpec,variables=networkConfig)
+        self.Model = CreateModel(self.HPs["NetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
         self.Model.compile(optimizer=self.opt, loss=["mse"],metrics=[])
-
-        # self.LoadModel({"modelPath":"models/TestVAE"})
-        self.Model.summary(print_fn=log.info)
 
     def Train(self,data,callbacks=[]):
         self.InitializeCallbacks(callbacks)
@@ -51,9 +46,6 @@ class Autoencoder(BaseMethod):
                         shuffle=self.HPs["Shuffle"],
                         callbacks=self.callbacks)
         self.SaveModel("models/TestAE")
-
-    def Test(self,data):
-        pass
 
     def ImagesFromImage(self,testImages):
         return self.Model.predict({"image":testImages})["Decoder"]

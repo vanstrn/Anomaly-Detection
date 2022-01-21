@@ -19,10 +19,8 @@ parser.add_argument("-n", "--network", required=False, default={}, action=JSON_L
                     help="Specify special parameters for the network.")
 parser.add_argument("-p", "--processor", required=False, default="gpu0",
                     help="Processor identifier string. [cpu / gpu0 / gpu1]")
-parser.add_argument("--train", required=False, default=True,
-                    action="store_false",help="Flag to skip training")
-parser.add_argument("--test", required=False, default=True,
-                    action="store_false",help="Flag to skip testing")
+parser.add_argument("--test", required=False,
+                    action="store_true",help="Flag to skip testing")
 args = parser.parse_args()
 
 #Reading in the config files.
@@ -48,18 +46,20 @@ try:
     dataset = LoadDataset(settings)
 
     model = LoadMethod(settings,dataset,networkConfig=args.network)
-    if args.train:
-        # Initialize Callbacks
-        callbacks=[]
-        if "Callbacks" in settings:
-            for dict in settings["Callbacks"]:
-                func = GetFunction(dict["Name"])
-                callbacks.append(func(logger,dataset,**dict["Arguments"]))
-
-        model.Train(dataset.trainData,callbacks=callbacks)
+    # Initialize Callbacks
+    callbacks=[]
+    if "Callbacks" in settings:
+        for dict in settings["Callbacks"]:
+            func = GetFunction(dict["Name"])
+            callbacks.append(func(logger,dataset,**dict["Arguments"]))
 
     if args.test:
-        model.Test(dataset.testData)
+        #Skipping Training and going straight to testing. This calls "On Train End" Callbacks
+        model.Test(callbacks=callbacks)
+    else:
+        model.Train(dataset.trainData,callbacks=callbacks)
+
+
 except Exception as e:
     log.warning("Closing environment due to error")
     log.error('Error', exc_info=e)

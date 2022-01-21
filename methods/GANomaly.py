@@ -2,10 +2,8 @@
 import numpy as np
 import tensorflow as tf
 import logging
-import matplotlib.pyplot as plt
 import time
 
-from utils.utils import CheckFilled
 from methods.utils import GetOptimizer
 from networks.networkKeras import CreateModel
 from .BaseMethod import BaseMethod
@@ -18,58 +16,48 @@ class GANomaly(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
 
-        self.HPs = {
+        self.HPs.update({
                     "LearningRate":0.00005,
                     "LatentSize":16,
                     "Optimizer":"Adam",
                     "Epochs":10,
-                    "BatchSize":32,
-                    "Shuffle":True,
                     "w_adv":1,
                     "w_con":50,
                     "w_enc":1,
-                     }
+                     })
 
-        self.requiredParams = [ "GenNetworkConfig",
-        "EncNetworkConfig",
-                                "DiscNetworkConfig",
-                                ]
+        self.requiredParams.Append([
+                "GenNetworkConfig",
+                "EncNetworkConfig",
+                "DiscNetworkConfig",
+                                ])
 
-        #Chacking Valid hyperparameters are specified
-        CheckFilled(self.requiredParams,settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
+        super().__init__(settingsDict)
 
         #Processing Other inputs
-        self.opt = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         networkConfig.update(dataset.outputSpec)
         networkConfig.update({"LatentSize":self.HPs["LatentSize"]})
-        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig)
-        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig)
-        self.Encoder = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig)
+        self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig,printSummary=True)
+        self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
+        self.Encoder = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
         self.Encoder2 = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig)
-        
-        # self.LoadModel({"modelPath":"models/TestVAE"})
-        self.Generator.summary(print_fn=log.info)
-        self.Discriminator.summary(print_fn=log.info)
-        self.Encoder.summary(print_fn=log.info)
 
-        self.generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-        self.discriminator_optimizer = tf.keras.optimizers.Adam(5e-5)
-        self.encoder_optimizer = tf.keras.optimizers.Adam(1e-4)
+        self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.encoder_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
     def Train(self,data,callbacks=[]):
         self.InitializeCallbacks(callbacks)
-        train_dataset = tf.data.Dataset.from_tensor_slices(data).shuffle(1000).batch(self.HPs["BatchSize"],drop_remainder=True)
+        train_dataset = self.SetupDataset(data)
         for epoch in range(self.HPs["Epochs"]):
             ts = time.time()
 
             for batch in train_dataset:
-                # info1 = self.train_step_GAN(batch)
                 info1={}
                 info2 = self.train_step_XZX(batch)
             self.ExecuteEpochEndCallbacks(epoch,{**info1,**info2})
-            print("End Epoch {}: Time {}".format(epoch,time.time()-ts))
+            log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
         self.ExecuteTrainEndCallbacks({})
 
     @tf.function
@@ -129,9 +117,6 @@ class GANomaly(BaseMethod):
         self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
 
         return {"Encoding Loss": tf.reduce_mean(l_encoder),"Construction Loss": tf.reduce_mean(l_context)}
-
-    def Test(self,data):
-        pass
 
     def InitializeCallbacks(self,callbacks):
         """Method initializes callbacks for training loops that are not `model.fit()`.
