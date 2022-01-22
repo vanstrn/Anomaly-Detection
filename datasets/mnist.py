@@ -12,11 +12,11 @@ class MNIST_Basic():
         lab_train = np.eye(10)[y_train]
         lab_test = np.eye(10)[y_test]
         self.trainData = {
-            "image":NormalizeImages(x_train).astype(np.float32),
+            "image":np.expand_dims(NormalizeImages(x_train).astype(np.float32),axis=-1),
             "label":lab_train.astype(np.float32),
         }
         self.testData = {
-            "image":NormalizeImages(x_test).astype(np.float32),
+            "image":np.expand_dims(NormalizeImages(x_test).astype(np.float32),axis=-1),
             "label":lab_test.astype(np.float32),
         }
 
@@ -34,29 +34,27 @@ class MNIST_Anomaly():
         lab_test[np.where(y_test==holdout)] = 1.
 
         self.trainData = {
-            "image":NormalizeImages(x_train).astype(np.float32),
+            "image":np.expand_dims(NormalizeImages(x_train).astype(np.float32),axis=-1),
         }
         self.testData = {
-            "image":NormalizeImages(x_test).astype(np.float32),
+            "image":np.expand_dims(NormalizeImages(x_test).astype(np.float32),axis=-1),
             "anom_label":lab_test.astype(np.float32),
         }
 
         self.inputSpec = {"image":[28,28,1]}
-        self.outputSpec = {"image_size":[28,28]}
+        self.outputSpec = {"image_size":[28,28,1]}
 
 
 class MNIST_RECON():
     def __init__(self):
         (x_train, _), (x_test, _) = tf.keras.datasets.mnist.load_data(path='mnist.npz')
 
-
-
         self.trainData = {
-            "image":NormalizeImages(x_train).astype(np.float32)
+            "image":np.expand_dims(NormalizeImages(x_train).astype(np.float32),axis=-1)
         }
         self.testData = {
-            "image":NormalizeImages(x_test).astype(np.float32)
+            "image":np.expand_dims(NormalizeImages(x_test).astype(np.float32),axis=-1)
         }
 
         self.inputSpec = {"image":[28,28,1]}
-        self.outputSpec = {"image_size":[28,28]}
+        self.outputSpec = {"image_size":[28,28,1]}
