@@ -9,3 +9,4 @@ RUN apt-get update && \
         unzip wget
 
 RUN pip install pandas scikit-learn scipy seaborn scikit-image matplotlib gitpython
+RUN pip install moviepy
