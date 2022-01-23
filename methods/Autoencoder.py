@@ -1,15 +1,10 @@
 
-import numpy as np
 import tensorflow as tf
 import logging
-import matplotlib.pyplot as plt
 
-from utils.utils import CheckFilled
 from methods.utils import GetOptimizer
 from networks.networkKeras import CreateModel
 from .BaseMethod import BaseMethod
-from sklearn import metrics
-import matplotlib.pyplot as plt
 
 log = logging.getLogger(__name__)
 
@@ -51,61 +46,4 @@ class Autoencoder(BaseMethod):
         return self.Model.predict({"image":testImages})["Decoder"]
 
     def AnomalyScore(self,testImages):
-        return tf.reduce_sum((testImages-tf.squeeze(self.ImagesFromImage(testImages)))**2,axis=[1,2])
-
-
-class TestReconstruction(tf.keras.callbacks.Callback):
-    def __init__(self,logger,dataset,numTests=4,numTrials=1):
-        super(TestReconstruction, self).__init__()
-        self.logger=logger
-        self.dataset=dataset
-        self.numTests=numTests
-        self.numTrials=numTrials
-
-    def on_epoch_end(self, epoch, logs=None):
-        """Plotting and saving several test images to specified directory. """
-
-        #Selecting a random subset of images to plot.
-        imgNums=np.random.randint(self.dataset.testData["image"].shape[0],size=[self.numTests])
-        _testImages=self.dataset.testData["image"][imgNums,:]
-        testImages = np.repeat(_testImages,self.numTrials,axis=0)
-        #
-        out = self.model.ImagesFromImage(testImages)
-        x = out.reshape([self.numTests,self.numTrials]+list(out.shape[1:]))
-        x2 = np.concatenate(np.split(x,self.numTests,axis=0),axis=2)
-        x3 = np.concatenate(np.split(x2,self.numTrials,axis=1),axis=3)
-
-        _testImages2 = _testImages.reshape(-1,28)
-
-        finalPlot = np.concatenate([np.squeeze(_testImages2),np.squeeze(x3)],axis=1)
-
-        self.logger.LogImage(np.expand_dims(finalPlot,axis=(0,-1)),"Reconstruction",epoch)
-
-class TestAnomaly(tf.keras.callbacks.Callback):
-    def __init__(self,logger,dataset):
-        super(TestAnomaly, self).__init__()
-        self.logger=logger
-        self.dataset=dataset
-
-    def on_epoch_end(self, epoch, logs=None):
-        """Plotting and saving several test images to specified directory. """
-
-        #Selecting a random subset of images to plot.
-        _testImages=self.dataset.testData["image"]
-        #
-        anom_score = self.model.AnomalyScore(_testImages)
-        labels=self.dataset.testData["anom_label"]
-        fpr, tpr, thresholds = metrics.roc_curve(labels,anom_score)
-        roc_auc = metrics.auc(fpr, tpr)
-
-        fig = plt.figure(figsize=(5,5))
-        plt.title('Receiver Operating Characteristic')
-        plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
-        plt.legend(loc = 'lower right')
-        plt.plot([0, 1], [0, 1],'r--')
-        plt.xlim([0, 1])
-        plt.ylim([0, 1])
-        plt.ylabel('True Positive Rate')
-        plt.xlabel('False Positive Rate')
-        self.logger.LogMatplotLib(fig,"ROC_Curve",epoch)
-        self.logger.LogScalar("AUC",roc_auc,epoch)
+        return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))

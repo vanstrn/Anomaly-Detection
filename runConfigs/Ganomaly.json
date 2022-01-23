@@ -15,9 +15,9 @@
       "Arguments":{}},
     {"Name":"utils.callbacks.TestGenerator",
       "Arguments":{}},
-    {"Name":"methods.Autoencoder.TestReconstruction",
+    {"Name":"utils.callbacks.TestReconstruction",
       "Arguments":{}},
-    {"Name":"methods.Autoencoder.TestAnomaly",
+    {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}}
     ]
 
