@@ -5,7 +5,6 @@ If a convolutional network is used then it would be equivalent to
 "DEEP CONVOLUTIONAL GENERATIVE ADVERSARIAL NETWORKS" (ICLR 2016)
 https://arxiv.org/abs/1511.06434
  """
-import numpy as np
 import tensorflow as tf
 import logging
 
@@ -40,54 +39,31 @@ class GAN(BaseMethod):
         self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig,printSummary=True)
         self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
 
-        self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        self.generatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.discriminatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     @tf.function
-    def train_step(self,images):
-        noise = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
+    def TrainStep(self,images):
+        randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
-        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-            generatedImages = self.Generator(noise, training=True)["Decoder"]
+        with tf.GradientTape() as genTape, tf.GradientTape() as discTape:
+            generatedImages = self.Generator(randomLatent, training=True)["Decoder"]
 
-            real_output = self.Discriminator(images, training=True)["Discrim"]
-            fake_output = self.Discriminator({"image":generatedImages}, training=True)["Discrim"]
+            realPred = self.Discriminator(images, training=True)["Discrim"]
+            fakePred = self.Discriminator({"image":generatedImages}, training=True)["Discrim"]
 
-            gen_loss = self.cross_entropy(tf.ones_like(fake_output), fake_output)
-            disc_loss = self.cross_entropy(tf.ones_like(real_output), real_output) + \
-                        self.cross_entropy(tf.zeros_like(fake_output), fake_output)
+            genLoss = self.crossEntropy(tf.ones_like(fakePred), fakePred)
+            discLoss = self.crossEntropy(tf.ones_like(realPred), realPred) + \
+                        self.crossEntropy(tf.zeros_like(fakePred), fakePred)
 
-        gradients_of_generator = gen_tape.gradient(gen_loss, self.Generator.trainable_variables)
-        gradients_of_discriminator = disc_tape.gradient(disc_loss, self.Discriminator.trainable_variables)
+        generatorGrads = genTape.gradient(genLoss, self.Generator.trainable_variables)
+        discriminatorGrads = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
 
-        self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.Generator.trainable_variables))
-        self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
+        self.generatorOptimizer.apply_gradients(zip(generatorGrads, self.Generator.trainable_variables))
+        self.discriminatorOptimizer.apply_gradients(zip(discriminatorGrads, self.Discriminator.trainable_variables))
 
-        return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss}
+        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss}
 
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)
-
-
-class TestGenerator(tf.keras.callbacks.Callback):
-    def __init__(self,logger,dataset,dx=5,dy=5):
-        super(TestGenerator, self).__init__()
-        self.logger=logger
-        self.dataset=dataset
-        self.dx=dx
-        self.dy=dy
-
-    def on_epoch_end(self, epoch, logs=None):
-        """Plotting and saving several test images to specified directory. """
-
-        #Selecting a random subset of images to plot.
-        latentSample = tf.random.normal([int(self.dx*self.dy), self.model.HPs["LatentSize"]])
-        #
-        out = self.model.ImagesFromLatent(latentSample)
-        x = out["Decoder"].reshape([self.dx,self.dy]+list(out["Decoder"].shape[1:]))
-        x2 = np.concatenate(np.split(x,self.dx,axis=0),axis=2)
-        x3 = np.squeeze(np.concatenate(np.split(x2,self.dy,axis=1),axis=3))
-
-
-        self.logger.LogImage(np.expand_dims(x3,axis=(0,-1)),"Generator",epoch)

@@ -1,4 +1,4 @@
-{ "RunName":"AE",
+{ "RunName":"GAN_1",
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
@@ -6,16 +6,14 @@
   },
 
   "Method":"methods.GAN.GAN",
-  "Dataset":{ "Name":"MNIST_Anomaly",
+  "Dataset":{ "Name":"MNIST_RECON",
               "Arguments":{}},
 
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"methods.GAN.TestGenerator",
-      "Arguments":{}},
-    {"Name":"methods.Autoencoder.TestAnomaly",
-      "Arguments":{}}
+    {"Name":"utils.callbacks.TestGenerator",
+      "Arguments":{"fixedLatent":true,"makeGIF":true}}
     ]
 
   }

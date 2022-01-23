@@ -13,7 +13,7 @@
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"methods.GAN.TestGenerator",
+    {"Name":"utils.callbacks.TestGenerator",
       "Arguments":{}},
     {"Name":"methods.Autoencoder.TestReconstruction",
       "Arguments":{}},
