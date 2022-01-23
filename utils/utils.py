@@ -109,8 +109,8 @@ class Logger():
             summary = tf.summary.scalar(tag,value,step=tf.cast(step, tf.int64))
         self.writer.flush()
 
-    def SaveImage(self,name,format="png"):
-        plt.savefig("{}/images/{}.{}".format(self.LOG_PATH,name,format))
+    def SaveImage(self,name,format="png",**kwargs):
+        plt.savefig("{}/images/{}.{}".format(self.LOG_PATH,name,format),**kwargs)
         plt.close()
 
     def LogImage(self,image,name,step):
