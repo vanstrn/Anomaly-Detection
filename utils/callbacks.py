@@ -3,7 +3,6 @@ File sets up custom callbacks useful for logging training.
 """
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from moviepy.editor import ImageSequenceClip
 from utils.math import *
 
 class LogTraining(tf.keras.callbacks.Callback):
@@ -63,5 +62,4 @@ class TestGenerator(tf.keras.callbacks.Callback):
 
     def on_train_end(self, logs=None):
         if self.makeGIF:
-            clip = ImageSequenceClip(self.gifBuffer, fps=3)
-            clip.write_gif('test.gif', fps=3)
+            self.logger.SaveGIF(clip=self.gifBuffer,name=self.name,fps=3)

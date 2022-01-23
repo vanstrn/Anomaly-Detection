@@ -12,6 +12,7 @@ import tensorflow as tf
 from utils.git import SaveCurrentGitState
 import argparse
 import matplotlib.pyplot as plt
+from moviepy.editor import ImageSequenceClip
 
 class JSON_Load(argparse.Action):
     def __init__(self, option_strings, dest, **kwargs):
@@ -117,6 +118,10 @@ class Logger():
         with self.writer.as_default():
             summary = tf.summary.image(name, image, step=step)
         self.writer.flush()
+
+    def SaveGIF(self,clip,name,step,fps=10):
+        clip = ImageSequenceClip(clip, fps=fps)
+        clip.write_gif("{}/images/{}.gif".format(self.LOG_PATH,name), fps=fps)
 
     def LogMatplotLib(self,figure,name,step):
         with self.writer.as_default():
