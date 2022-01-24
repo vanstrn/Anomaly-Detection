@@ -28,20 +28,16 @@ class AnoGAN(GAN):
     def GenerateLatent(self,sample):
         #Building the latent network
         LatentPredNet = CreateModel(self.HPs["LatentNetworkConfig"],self.inputSpec,variables={"LatentSize":self.HPs["LatentSize"]})
-        #Setting up the loss functions.
-        latent_optimizer = tf.keras.optimizers.Adam(1e-4)
+        latentOptimizer = tf.keras.optimizers.Adam(1e-4)
         #Training the latent network
         for _ in range(self.HPs["AnomalyFitEpochs"]):
             with tf.GradientTape() as tape:
                 z = LatentPredNet(sample)["Latent"]
                 out = tf.squeeze(self.Generator(z)["Decoder"])
-                # print(out.shape)
-                # print(sample.shape)
-                latent_loss = tf.math.abs(out-sample)
-            gradients_of_latent = tape.gradient(latent_loss, LatentPredNet.trainable_variables)
-            latent_optimizer.apply_gradients(zip(gradients_of_latent, LatentPredNet.trainable_variables))
+                latentLoss = tf.math.abs(out-sample)
+            latentGradients = tape.gradient(latentLoss, LatentPredNet.trainable_variables)
+            latentOptimizer.apply_gradients(zip(latentGradients, LatentPredNet.trainable_variables))
 
-        #Returning the final z
         return LatentPredNet(sample)["Latent"]
 
     def ImagesFromImage(self,sample):

@@ -2,6 +2,7 @@ import tensorflow as tf
 import logging
 from methods.utils import Requirements
 import time
+from pprint import pformat
 
 log = logging.getLogger(__name__)
 
@@ -19,6 +20,8 @@ class BaseMethod():
         self.requiredParams.Check(settingsDict["NetworkHPs"])
         self.HPs.update(settingsDict["NetworkHPs"])
 
+        log.info("Hyperparameters:\n{}".format(pformat(self.HPs)))
+
 
     def SetupDataset(self,data):
         dataset = tf.data.Dataset.from_tensor_slices(data)
@@ -33,7 +36,7 @@ class BaseMethod():
             ts = time.time()
 
             for batch in train_dataset:
-                info = self.train_step(batch)
+                info = self.TrainStep(batch)
             self.ExecuteEpochEndCallbacks(epoch,info)
             log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
         self.ExecuteTrainEndCallbacks({})

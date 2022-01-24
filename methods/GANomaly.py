@@ -42,81 +42,81 @@ class GANomaly(BaseMethod):
         self.Encoder = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
         self.Encoder2 = CreateModel(self.HPs["EncNetworkConfig"],dataset.inputSpec,variables=networkConfig)
 
-        self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.encoder_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        self.generatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.discriminatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.encoderOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     def Train(self,data,callbacks=[]):
         self.InitializeCallbacks(callbacks)
-        train_dataset = self.SetupDataset(data)
+        trainDataset = self.SetupDataset(data)
         for epoch in range(self.HPs["Epochs"]):
             ts = time.time()
 
-            for batch in train_dataset:
+            for batch in trainDataset:
                 info1={}
-                info2 = self.train_step_XZX(batch)
+                info2 = self.TrainStepXZX(batch)
             self.ExecuteEpochEndCallbacks(epoch,{**info1,**info2})
             log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
         self.ExecuteTrainEndCallbacks({})
 
     @tf.function
-    def train_step_GAN(self,images):
-        noise = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
+    def TrainStepGAN(self,images):
+        randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
-        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-            out = self.Generator(noise, training=True)
-            generated_images = {"image":out["Decoder"]}
-            real_output = self.Discriminator(images, training=True)
-            fake_output = self.Discriminator(generated_images, training=True)
-            real_label = real_output["Discrim"]; real_features = real_output["Features"]
-            fake_label = fake_output["Discrim"]; fake_features = fake_output["Features"]
+        with tf.GradientTape() as genTape, tf.GradientTape() as discTape:
+            generatedImages = self.Generator(randomLatent, training=True)["Decoder"]
 
-            gen_loss = self.cross_entropy(tf.ones_like(fake_label), fake_label)
-            # feat_loss = tf.reduce_mean(real_features-fake_features)**2.0
-            disc_loss = self.cross_entropy(tf.ones_like(real_label), real_label) + \
-                        self.cross_entropy(tf.zeros_like(fake_label), fake_label)
-            gt_loss = gen_loss # + feat_loss
+            realOutput = self.Discriminator(images, training=True)
+            fakeOutput = self.Discriminator({"image":generatedImages}, training=True)
+            realPred = realOutput["Discrim"]; realFeatures = realOutput["Features"]
+            fakePred = fakeOutput["Discrim"]; fakeFeatures = fakeOutput["Features"]
 
-        gradients_of_generator = gen_tape.gradient(gt_loss, self.Generator.trainable_variables)
-        gradients_of_discriminator = disc_tape.gradient(disc_loss, self.Discriminator.trainable_variables)
+            genLoss = self.crossEntropy(tf.ones_like(fakePred), fakePred)
+            featLoss = tf.reduce_mean(realFeatures-fakeFeatures)**2.0
+            discLoss = self.crossEntropy(tf.ones_like(realPred), realPred) + \
+                        self.crossEntropy(tf.zeros_like(fakePred), fakePred)
+            genAllLoss = genLoss # + feat_loss
 
-        self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.Generator.trainable_variables))
-        self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
+        generatorGradients = genTape.gradient(genAllLoss, self.Generator.trainable_variables)
+        discriminatorGradients = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
 
-        return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss}
+        self.generatorOptimizer.apply_gradients(zip(generatorGradients, self.Generator.trainable_variables))
+        self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
+
+        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss}
 
     # @tf.function
-    def train_step_XZX(self,images):
+    def TrainStepXZX(self,images):
 
-        with tf.GradientTape() as gen_tape, tf.GradientTape() as enc_tape, tf.GradientTape() as disc_tape:
+        with tf.GradientTape() as genTape, tf.GradientTape() as encTape, tf.GradientTape() as discTape:
             z = self.Encoder(images, training=True)["Latent"]
             x_hat = self.Generator(z, training=True)["Decoder"]
             z_hat = self.Encoder2(x_hat, training=True)["Latent"]
 
-            real_output = self.Discriminator(images, training=True)
-            fake_output = self.Discriminator(x_hat, training=True)
-            real_label = real_output["Discrim"]; real_features = real_output["Features"]
-            fake_label = fake_output["Discrim"]; fake_features = fake_output["Features"]
+            realOutput = self.Discriminator(images, training=True)
+            fakeOutput = self.Discriminator(x_hat, training=True)
+            realPred = realOutput["Discrim"]; realFeatures = realOutput["Features"]
+            fakePred = fakeOutput["Discrim"]; fakeFeatures = fakeOutput["Features"]
 
-            gen_loss = self.cross_entropy(tf.ones_like(fake_label), fake_label)
-            feat_loss = tf.reduce_mean(real_features-fake_features)**2.0
-            disc_loss = self.cross_entropy(tf.ones_like(real_label), real_label) + \
-                        self.cross_entropy(tf.zeros_like(fake_label), fake_label)
+            genLoss = self.crossEntropy(tf.ones_like(fakePred), fakePred)
+            featLoss = tf.reduce_mean(realFeatures-fakeFeatures)**2.0
+            discLoss = self.crossEntropy(tf.ones_like(realPred), realPred) + \
+                        self.crossEntropy(tf.zeros_like(fakePred), fakePred)
 
-            l_encoder = (z_hat-z)**2
-            l_context = tf.math.abs(tf.squeeze(x_hat)-images["image"])
-            total_loss = tf.reduce_mean(l_encoder) +tf.reduce_mean(l_context) + gen_loss + feat_loss
+            encoderLoss = (z_hat-z)**2
+            contextLoss = tf.math.abs(tf.squeeze(x_hat)-images["image"])
+            totalLoss = tf.reduce_mean(encoderLoss) +tf.reduce_mean(contextLoss) + genLoss + featLoss
 
-        gradients_of_generator = gen_tape.gradient(total_loss, self.Generator.trainable_variables)
-        gradients_of_encoder = enc_tape.gradient(total_loss, self.Encoder.trainable_variables+self.Encoder2.trainable_variables)
-        gradients_of_discriminator = disc_tape.gradient(total_loss, self.Discriminator.trainable_variables)
+        generatorGradients = genTape.gradient(totalLoss, self.Generator.trainable_variables)
+        discriminatorGradients = discTape.gradient(totalLoss, self.Discriminator.trainable_variables)
+        encoderGradients = encTape.gradient(totalLoss, self.Encoder.trainable_variables+self.Encoder2.trainable_variables)
 
-        self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.Generator.trainable_variables))
-        self.encoder_optimizer.apply_gradients(zip(gradients_of_encoder, self.Encoder.trainable_variables+self.Encoder2.trainable_variables))
-        self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
+        self.generatorOptimizer.apply_gradients(zip(generatorGradients, self.Generator.trainable_variables))
+        self.encoderOptimizer.apply_gradients(zip(encoderGradients, self.Encoder.trainable_variables+self.Encoder2.trainable_variables))
+        self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
-        return {"Encoding Loss": tf.reduce_mean(l_encoder),"Construction Loss": tf.reduce_mean(l_context)}
+        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss,"Feature Loss":featLoss,"Encoding Loss": tf.reduce_mean(encoderLoss),"Construction Loss": tf.reduce_mean(contextLoss)}
 
     def InitializeCallbacks(self,callbacks):
         """Method initializes callbacks for training loops that are not `model.fit()`.
@@ -133,7 +133,7 @@ class GANomaly(BaseMethod):
         return self.Generator.predict(sample)
 
     def ImagesFromLatent(self,sample):
-        return self.Generator.predict(sample)
+        return self.Generator.predict(sample)["Decoder"]
 
     def ImagesFromImage(self,testImages):
         z = self.Encoder.predict({"image":testImages})["Latent"]

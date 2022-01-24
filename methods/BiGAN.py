@@ -51,37 +51,37 @@ class BiGAN(BaseMethod):
         _datasetSpec = {"features":[self.HPs["LatentSize"]],**dataset.inputSpec}
         self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],_datasetSpec,variables=networkConfig,printSummary=True)
 
-        self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        self.generatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.discriminatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 
     @tf.function
-    def train_step(self,images):
-        noise = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
+    def TrainStep(self,images):
+        randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
-        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-            fakeImage = self.Generator(noise, training=True)["Decoder"]
+        with tf.GradientTape() as genTape, tf.GradientTape() as discTape:
+            generatedImages = self.Generator(randomLatent, training=True)["Decoder"]
 
             e_z = self.Encoder(images)["Latent"]
-            real_output = self.Discriminator({**images,"features":e_z}, training=True)["Discrim"]
-            fake_output = self.Discriminator({"image":fakeImage,"features":noise}, training=True)["Discrim"]
+            realPred = self.Discriminator({**images,"features":e_z}, training=True)["Discrim"]
+            fakePred = self.Discriminator({"image":generatedImages,"features":randomLatent}, training=True)["Discrim"]
 
-            disc_loss = self.cross_entropy(tf.ones_like(real_output), real_output) + \
-                        self.cross_entropy(tf.zeros_like(fake_output), fake_output)
-            gen_loss = self.cross_entropy(tf.ones_like(fake_output), fake_output)
-            enc_loss = self.cross_entropy(tf.zeros_like(real_output), real_output)
-            t_loss=gen_loss+enc_loss
+            discLoss = self.crossEntropy(tf.ones_like(realPred), realPred) + \
+                        self.crossEntropy(tf.zeros_like(fakePred), fakePred)
+            genLoss = self.crossEntropy(tf.ones_like(fakePred), fakePred)
+            encLoss = self.crossEntropy(tf.zeros_like(realPred), realPred)
+            genAllLoss = genLoss + encLoss
 
-        gradients_of_generator = gen_tape.gradient(t_loss, self.Generator.trainable_variables+self.Encoder.trainable_variables)
-        gradients_of_discriminator = disc_tape.gradient(disc_loss, self.Discriminator.trainable_variables)
+        generatorGradients = genTape.gradient(genAllLoss, self.Generator.trainable_variables+self.Encoder.trainable_variables)
+        discriminatorGradients = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
 
-        self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.Generator.trainable_variables+self.Encoder.trainable_variables))
-        self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
+        self.generatorOptimizer.apply_gradients(zip(generatorGradients, self.Generator.trainable_variables+self.Encoder.trainable_variables))
+        self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
         return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss,"Encoder Loss": enc_loss}
 
     def ImagesFromLatent(self,sample):
-        return self.Generator.predict(sample)
+        return self.Generator.predict(sample)["Decoder"]
 
     def ImagesFromImage(self,testImages):
         z = self.Encoder.predict({"image":testImages})["Latent"]

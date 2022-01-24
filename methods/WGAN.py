@@ -44,45 +44,45 @@ class WGAN(BaseMethod):
         self.Generator = CreateModel(self.HPs["GenNetworkConfig"],{"latent":self.HPs["LatentSize"]},variables=networkConfig,printSummary=True)
         self.Discriminator = CreateModel(self.HPs["DiscNetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
 
-        self.generator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.discriminator_optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.generatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.discriminatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
 
         self.counter=0
 
     def Train(self,data,callbacks=[]):
         self.InitializeCallbacks(callbacks)
-        train_dataset = tf.data.Dataset.from_tensor_slices(data).batch(self.HPs["BatchSize"])
+        trainDataset = self.SetupDataset(data)
         for epoch in range(self.HPs["Epochs"]):
             ts = time.time()
 
-            for batch in train_dataset:
+            for batch in trainDataset:
                 trainGen = (self.counter % self.HPs["GenUpdateFreq"] == 0)
-                info = self.train_step(batch,trainGen)
+                info = self.TrainStep(batch,trainGen)
                 self.ClipDiscriminator()
                 self.counter+=1
             self.ExecuteEpochEndCallbacks(epoch,info)
-            print("End Epoch {}: Time {}".format(epoch,time.time()-ts))
+            log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
         self.ExecuteTrainEndCallbacks({})
 
     @tf.function
-    def train_step(self,images,trainGen=True):
-        noise = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
+    def TrainStep(self,images,trainGen=True):
+        randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
-        with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
-            out = self.Generator(noise, training=True)
-            generated_images = {"image":out["Decoder"]}
-            real_output = self.Discriminator(images, training=True)["Discrim"]
-            fake_output = self.Discriminator(generated_images, training=True)["Discrim"]
+        with tf.GradientTape() as genTape, tf.GradientTape() as discTape:
+            generatedImages = self.Generator(randomLatent, training=True)["Decoder"]
 
-            gen_loss = -tf.reduce_sum(fake_output)
-            disc_loss =  -tf.reduce_mean(real_output) + tf.reduce_mean(fake_output)
+            realPred = self.Discriminator(images, training=True)["Discrim"]
+            fakePred = self.Discriminator({"image":generatedImages}, training=True)["Discrim"]
+
+            genLoss = -tf.reduce_sum(fakePred)
+            discLoss =  -tf.reduce_mean(realPred) + tf.reduce_mean(fakePred)
 
         if trainGen:
-            gradients_of_generator = gen_tape.gradient(gen_loss, self.Generator.trainable_variables)
-            self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.Generator.trainable_variables))
+            generatorGradients = genTape.gradient(genLoss, self.Generator.trainable_variables)
+            self.generatorOptimizer.apply_gradients(zip(generatorGradients, self.Generator.trainable_variables))
 
-        gradients_of_discriminator = disc_tape.gradient(disc_loss, self.Discriminator.trainable_variables)
-        self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.Discriminator.trainable_variables))
+        discriminatorGradients = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
+        self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
         return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss}
 
@@ -104,4 +104,4 @@ class WGAN(BaseMethod):
             params.assign(tf.clip_by_value(params,-self.HPs["DiscrimClipValue"],self.HPs["DiscrimClipValue"]))
 
     def ImagesFromLatent(self,sample):
-        return self.Generator.predict(sample)
+        return self.Generator.predict(sample)["Decoder"]

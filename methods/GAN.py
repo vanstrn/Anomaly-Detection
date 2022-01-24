@@ -57,13 +57,13 @@ class GAN(BaseMethod):
             discLoss = self.crossEntropy(tf.ones_like(realPred), realPred) + \
                         self.crossEntropy(tf.zeros_like(fakePred), fakePred)
 
-        generatorGrads = genTape.gradient(genLoss, self.Generator.trainable_variables)
-        discriminatorGrads = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
+        generatorGradients = genTape.gradient(genLoss, self.Generator.trainable_variables)
+        discriminatorGradients = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
 
-        self.generatorOptimizer.apply_gradients(zip(generatorGrads, self.Generator.trainable_variables))
-        self.discriminatorOptimizer.apply_gradients(zip(discriminatorGrads, self.Discriminator.trainable_variables))
+        self.generatorOptimizer.apply_gradients(zip(generatorGradients, self.Generator.trainable_variables))
+        self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
         return {"Generator Loss": genLoss,"Discriminator Loss": discLoss}
 
     def ImagesFromLatent(self,sample):
-        return self.Generator.predict(sample)
+        return self.Generator.predict(sample)["Decoder"]
