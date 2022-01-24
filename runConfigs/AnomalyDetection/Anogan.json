@@ -1,4 +1,4 @@
-{ "RunName":"AnoGAN",
+{ "RunName":"AnoGAN_1",
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",

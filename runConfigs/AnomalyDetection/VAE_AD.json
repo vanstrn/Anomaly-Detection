@@ -1,4 +1,4 @@
-{ "RunName":"VAE",
+{ "RunName":"VAE_AD_1",
   "NetworkHPs":{
     "NetworkConfig":"netConfigs/VAE/BasicVAE.json",
     "Epochs":25
