@@ -6,7 +6,7 @@
     "Epochs":25
   },
 
-  "Method":"methods.BiGAN.BIGAN",
+  "Method":"methods.BiGAN.BiGAN",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 

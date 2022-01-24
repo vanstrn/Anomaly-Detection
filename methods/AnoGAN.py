@@ -22,7 +22,7 @@ class AnoGAN(GAN):
             "PredBatchSize":16,
             "AnomalyFitEpochs":10,
             })
-        self.reqiurements.Append(["LatentNetworkConfig"])
+        self.requiredParams.Append(["LatentNetworkConfig"])
         super().__init__(settingsDict,dataset,networkConfig)
 
     def GenerateLatent(self,sample):
@@ -33,7 +33,7 @@ class AnoGAN(GAN):
         for _ in range(self.HPs["AnomalyFitEpochs"]):
             with tf.GradientTape() as tape:
                 z = LatentPredNet(sample)["Latent"]
-                out = tf.squeeze(self.Generator(z)["Decoder"])
+                out = self.Generator(z)["Decoder"]
                 latentLoss = tf.math.abs(out-sample)
             latentGradients = tape.gradient(latentLoss, LatentPredNet.trainable_variables)
             latentOptimizer.apply_gradients(zip(latentGradients, LatentPredNet.trainable_variables))
@@ -47,10 +47,10 @@ class AnoGAN(GAN):
         testDataset = tf.data.Dataset.from_tensor_slices(sample).batch(self.HPs["PredBatchSize"])
         for batch in testDataset:
             z = self.GenerateLatent(batch)
-            tmp = tf.squeeze(self.Generator.predict(z)["Decoder"])
+            tmp = self.Generator.predict(z)["Decoder"]
             imagePred[i:i+batch.shape[0],:] = tmp
             i+=batch.shape[0]
         return imagePred
 
     def AnomalyScore(self,testImages):
-        return tf.reduce_sum((testImages-tf.squeeze(self.ImagesFromImage(testImages)))**2,axis=[1,2])
+        return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))

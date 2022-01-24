@@ -104,9 +104,9 @@ class GANomaly(BaseMethod):
             discLoss = self.crossEntropy(tf.ones_like(realPred), realPred) + \
                         self.crossEntropy(tf.zeros_like(fakePred), fakePred)
 
-            encoderLoss = (z_hat-z)**2
-            contextLoss = tf.math.abs(tf.squeeze(x_hat)-images["image"])
-            totalLoss = tf.reduce_mean(encoderLoss) +tf.reduce_mean(contextLoss) + genLoss + featLoss
+            encoderLoss = tf.reduce_mean((z_hat-z)**2)
+            contextLoss = tf.reduce_mean(tf.math.abs(x_hat-images["image"]))
+            totalLoss = encoderLoss + contextLoss + genLoss + featLoss
 
         generatorGradients = genTape.gradient(totalLoss, self.Generator.trainable_variables)
         discriminatorGradients = discTape.gradient(totalLoss, self.Discriminator.trainable_variables)
@@ -116,7 +116,7 @@ class GANomaly(BaseMethod):
         self.encoderOptimizer.apply_gradients(zip(encoderGradients, self.Encoder.trainable_variables+self.Encoder2.trainable_variables))
         self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
-        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss,"Feature Loss":featLoss,"Encoding Loss": tf.reduce_mean(encoderLoss),"Construction Loss": tf.reduce_mean(contextLoss)}
+        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss,"Feature Loss":featLoss,"Encoding Loss": encoderLoss,"Construction Loss": contextLoss}
 
     def InitializeCallbacks(self,callbacks):
         """Method initializes callbacks for training loops that are not `model.fit()`.
@@ -140,4 +140,4 @@ class GANomaly(BaseMethod):
         return self.Generator.predict({"latent":z})["Decoder"]
 
     def AnomalyScore(self,testImages):
-        return tf.reduce_sum((testImages-tf.squeeze(self.ImagesFromImage(testImages)))**2,axis=[1,2])
+        return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))

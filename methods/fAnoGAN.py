@@ -49,7 +49,7 @@ class fAnoGAN(BiGAN):
             # izi Training
             reconImage = self.Generator(e_z, training=True)["Decoder"]
             fakeFeatures = self.Discriminator({"image":reconImage,"features":e_z}, training=True)["Features"]
-            iziLoss = self.mse(images["image"], tf.squeeze(reconImage))
+            iziLoss = self.mse(images["image"], reconImage)
             iziFeatureLoss = self.mse(realFeatures, fakeFeatures)
 
             totalloss = genLoss + encLoss + zizLoss + iziLoss + iziFeatureLoss
@@ -67,7 +67,7 @@ class fAnoGAN(BiGAN):
         return self.Discriminator.predict({"image":testImages,"features":z})["Discrim"]
 
     def ImageAnomaly(self,testImages):
-        return tf.reduce_sum((testImages-tf.squeeze(self.ImagesFromImage(testImages)))**2,axis=[1,2])
+        return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))
 
     def FeatureAnomaly(self,testImages):
         z = self.Encoder.predict({"image":testImages})["Latent"]
@@ -122,7 +122,7 @@ class fAnoWGAN(fAnoGAN):
             # izi Training
             reconImage = self.Generator(e_z, training=True)["Decoder"]
             featureFake = self.Discriminator({"image":reconImage,"features":e_z}, training=True)["Features"]
-            iziLoss = self.mse(images["image"], tf.squeeze(reconImage))
+            iziLoss = self.mse(images["image"], reconImage)
             iziFeatureLoss = self.mse(realFeatures, featureFake)
 
             totalLoss = genLoss + encLoss + zizLoss + iziLoss + iziFeatureLoss
@@ -134,7 +134,7 @@ class fAnoWGAN(fAnoGAN):
         discriminatorGradients = disc_tape.gradient(discLoss, self.Discriminator.trainable_variables)
         self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
-        return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss,"Encoder Loss": enc_loss}
+        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss,"Encoder Loss": encLoss}
 
     def Train(self,data,callbacks=[]):
         self.InitializeCallbacks(callbacks)

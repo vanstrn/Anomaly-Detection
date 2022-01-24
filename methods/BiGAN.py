@@ -78,7 +78,7 @@ class BiGAN(BaseMethod):
         self.generatorOptimizer.apply_gradients(zip(generatorGradients, self.Generator.trainable_variables+self.Encoder.trainable_variables))
         self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
-        return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss,"Encoder Loss": enc_loss}
+        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss,"Encoder Loss": encLoss}
 
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)["Decoder"]
@@ -92,6 +92,6 @@ class BiGAN(BaseMethod):
         return self.Discriminator.predict({"image":testImages,"features":z})["Discrim"]
 
     def AnomalyScore(self,testImages,alpha=0.9):
-        v1 = tf.reduce_sum((testImages-tf.squeeze(self.ImagesFromImage(testImages)))**2,axis=[1,2])
+        v1 = tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))
         v2 = tf.squeeze(self.ImageDiscrim(testImages))
         return alpha * v1 + (1-alpha)*v2

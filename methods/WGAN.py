@@ -84,7 +84,7 @@ class WGAN(BaseMethod):
         discriminatorGradients = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
         self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.Discriminator.trainable_variables))
 
-        return {"Generator Loss": gen_loss,"Discriminator Loss": disc_loss}
+        return {"Generator Loss": genLoss,"Discriminator Loss": discLoss}
 
     @tf.function()
     def ClipDiscriminator(self):
