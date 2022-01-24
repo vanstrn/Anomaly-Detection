@@ -1,0 +1,18 @@
+{ "RunName":"AE",
+  "NetworkHPs":{
+    "NetworkConfig":"netConfigs/AE/BasicAE.json",
+    "Epochs":25
+  },
+
+  "Method":"methods.Autoencoder.Autoencoder",
+  "Dataset":{ "Name":"MNIST_RECON",
+              "Arguments":{}},
+
+  "Callbacks":[
+    {"Name":"utils.callbacks.LogTraining",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.TestReconstruction",
+      "Arguments":{}}
+    ]
+
+  }

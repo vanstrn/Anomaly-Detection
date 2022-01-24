@@ -1,0 +1,18 @@
+{ "RunName":"VAE",
+  "NetworkHPs":{
+    "NetworkConfig":"netConfigs/VAE/BasicVAE.json",
+    "Epochs":25
+  },
+
+  "Method":"methods.Autoencoder.Autoencoder",
+  "Dataset":{ "Name":"MNIST_RECON",
+              "Arguments":{}},
+
+  "Callbacks":[
+    {"Name":"utils.callbacks.LogTraining",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.TestReconstruction",
+      "Arguments":{"numTrials":5}}
+    ]
+
+  }
