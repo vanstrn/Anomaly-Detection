@@ -13,7 +13,9 @@
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.TestGenerator",
+    {"Name":"utils.callbacks.PlotGenerator",
+      "Arguments":{"fixedLatent":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.PlotLatentSpace",
       "Arguments":{}}
     ]
 

@@ -11,8 +11,8 @@
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.TestReconstruction",
-      "Arguments":{"numTrials":5}}
+    {"Name":"utils.callbacks.PlotReconstruction",
+      "Arguments":{"dy":2,"fixedSet":true,"makeGIF":true}}
     ]
 
   }

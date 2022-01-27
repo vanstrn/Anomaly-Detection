@@ -11,7 +11,7 @@
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.TestReconstruction",
+    {"Name":"utils.callbacks.PlotReconstruction",
       "Arguments":{"numTrials":5}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}}

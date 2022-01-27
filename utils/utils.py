@@ -112,14 +112,13 @@ class Logger():
 
     def SaveImage(self,name,format="png",**kwargs):
         plt.savefig("{}/images/{}.{}".format(self.LOG_PATH,name,format),**kwargs)
-        plt.close()
 
     def LogImage(self,image,name,step):
         with self.writer.as_default():
             summary = tf.summary.image(name, image, step=step)
         self.writer.flush()
 
-    def SaveGIF(self,clip,name,step,fps=10):
+    def SaveGIF(self,clip,name,fps=10):
         clip = ImageSequenceClip(clip, fps=fps)
         clip.write_gif("{}/images/{}.gif".format(self.LOG_PATH,name), fps=fps)
 

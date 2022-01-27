@@ -13,7 +13,7 @@
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.TestGenerator",
+    {"Name":"utils.callbacks.PlotGenerator",
       "Arguments":{}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}}

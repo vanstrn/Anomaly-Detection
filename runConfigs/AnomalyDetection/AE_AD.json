@@ -11,9 +11,11 @@
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.TestReconstruction",
+    {"Name":"utils.callbacks.PlotReconstruction",
       "Arguments":{}},
     {"Name":"utils.callbacks.TestAnomaly",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotImageAnomaly",
       "Arguments":{}}
     ]
 
