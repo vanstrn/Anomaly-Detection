@@ -17,7 +17,7 @@ class MNIST_Basic():
         }
         self.testData = {
             "image":np.expand_dims(RGBtoNORM(x_test).astype(np.float32),axis=-1),
-            "label":lab_test.astype(np.float32),
+            "label":lab_test.astype(np.int32),
         }
 
         self.inputSpec = {"image":[28,28,1]}
@@ -39,7 +39,7 @@ class MNIST_Anomaly():
         self.testData = {
             "image":np.expand_dims(RGBtoNORM(x_test).astype(np.float32),axis=-1),
             "anom_label":lab_test.astype(np.float32),
-            "label":y_test.astype(np.float32),
+            "label":y_test.astype(np.int32),
         }
 
         self.inputSpec = {"image":[28,28,1]}
