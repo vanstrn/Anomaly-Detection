@@ -39,6 +39,7 @@ class MNIST_Anomaly():
         self.testData = {
             "image":np.expand_dims(RGBtoNORM(x_test).astype(np.float32),axis=-1),
             "anom_label":lab_test.astype(np.float32),
+            "label":y_test.astype(np.float32),
         }
 
         self.inputSpec = {"image":[28,28,1]}
@@ -47,13 +48,14 @@ class MNIST_Anomaly():
 
 class MNIST_RECON():
     def __init__(self):
-        (x_train, _), (x_test, _) = tf.keras.datasets.mnist.load_data(path='mnist.npz')
+        (x_train, _), (x_test, y_test) = tf.keras.datasets.mnist.load_data(path='mnist.npz')
 
         self.trainData = {
             "image":np.expand_dims(RGBtoNORM(x_train).astype(np.float32),axis=-1)
         }
         self.testData = {
-            "image":np.expand_dims(RGBtoNORM(x_test).astype(np.float32),axis=-1)
+            "image":np.expand_dims(RGBtoNORM(x_test).astype(np.float32),axis=-1),
+            "label":y_test.astype(np.float32),
         }
 
         self.inputSpec = {"image":[28,28,1]}
