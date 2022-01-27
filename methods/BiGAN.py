@@ -83,6 +83,9 @@ class BiGAN(BaseMethod):
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)["Decoder"]
 
+    def LatentFromImage(self,sample):
+        return self.Encoder.predict(sample)["Latent"]
+
     def ImagesFromImage(self,testImages):
         z = self.Encoder.predict({"image":testImages})["Latent"]
         return self.Generator.predict({"latent":z})["Decoder"]

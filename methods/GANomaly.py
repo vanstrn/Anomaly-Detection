@@ -130,7 +130,7 @@ class GANomaly(BaseMethod):
         self.callbacks = tf.keras.callbacks.CallbackList(callbacks,model=self,LatentSize=self.HPs["LatentSize"])
 
     def LatentFromImage(self,sample):
-        return self.Generator.predict(sample)
+        return self.Encoder.predict(sample)["Latent"]
 
     def ImagesFromLatent(self,sample):
         return self.Generator.predict(sample)["Decoder"]
