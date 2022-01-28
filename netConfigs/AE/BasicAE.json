@@ -84,7 +84,7 @@
         "Parameters":{"filters":1,
                       "kernel_size":3,
                       "strides":1,
-                      "activation":null}},
+                      "activation":"tanh"}},
       { "layerType":"CentralCropping2D",
         "layerName":"Decoder",
         "Output":true,

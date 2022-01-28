@@ -60,7 +60,7 @@ class PlotGenerator(tf.keras.callbacks.Callback):
         if self.rawImage:
             fig = plt.figure()
             if x.shape[-1]==1:
-                plt.imshow(x,cmap='Greys')
+                plt.imshow(x,cmap='Greys_r')
             plt.axis('off')
             self.logger.SaveImage("{}_Epoch{}".format(self.name,epoch),bbox_inches='tight')
 
@@ -154,35 +154,36 @@ class PlotImageAnomaly(tf.keras.callbacks.Callback):
                 self.anomSet=np.random.choice(np.where(np.squeeze(self.dataset.testData["anom_label"])==1)[0],size=self.dy*self.dxAnom)
             imgNums = np.concatenate([self.normSet,self.anomSet])
         else:
-            print(self.dataset.testData["anom_label"].shape)
-            print(np.squeeze(self.dataset.testData["anom_label"]).shape)
-            print(np.where(np.squeeze(self.dataset.testData["anom_label"])==1)[0].shape)
             normSet=np.random.choice(np.where(np.squeeze(self.dataset.testData["anom_label"])==0)[0],size=self.dy*self.dxNorm)
             anomSet=np.random.choice(np.where(np.squeeze(self.dataset.testData["anom_label"])==1)[0],size=self.dy*self.dxAnom)
             imgNums = np.concatenate([normSet,anomSet])
 
         testImages=self.dataset.testData["image"][imgNums,:]
-        _testImages = testImages.reshape([self.dxNorm+self.dxAnom,self.dy]+list(testImages.shape[1:]))
-        _testImages = np.squeeze(np.concatenate(np.split(testImages,self.dxNorm+self.dxAnom,axis=0),axis=2),axis=0)
-        _testImages = np.squeeze(np.concatenate(np.split(testImages,self.dy,axis=0),axis=2),axis=0)
+        _testImages = testImages.reshape([self.dxNorm+self.dxAnom,self.dy,]+list(testImages.shape[1:]))
+        _testImages = np.squeeze(np.concatenate(np.split(_testImages,self.dxNorm+self.dxAnom,axis=0),axis=3),axis=0)
+        _testImages = np.squeeze(np.concatenate(np.split(_testImages,self.dy,axis=0),axis=1),axis=0)
 
         out = self.model.ImagesFromImage(testImages)
-        x = out.reshape([self.dxNorm+self.dxAnom,self.dy]+list(out.shape[1:]))
-        x = np.squeeze(np.concatenate(np.split(x,self.dxNorm+self.dxAnom,axis=0),axis=2),axis=0)
-        x = np.squeeze(np.concatenate(np.split(x,self.dy,axis=0),axis=2),axis=0)
+        x = out.reshape([self.dxNorm+self.dxAnom,self.dy,]+list(out.shape[1:]))
+        x = np.squeeze(np.concatenate(np.split(x,self.dxNorm+self.dxAnom,axis=0),axis=3),axis=0)
+        x = np.squeeze(np.concatenate(np.split(x,self.dy,axis=0),axis=1),axis=0)
 
         anomalyMap = (_testImages-x)**2
 
         fig, (ax1, ax2,ax3) = plt.subplots(1, 3)
-        fig.suptitle('Anomaly Detection')
-        ax1.imshow(_testImages);ax1.set_title('Input Image');ax1.axis('off')
-        ax2.imshow(x);ax2.set_title('Predicted Image');ax2.axis('off')
+        fig.suptitle('Anomaly Detection (L - Normal Images | R - Anomalous Images)')
+        if x.shape[-1]==1:
+            ax1.imshow(_testImages,cmap='Greys_r');ax1.set_title('Input Image');ax1.axis('off')
+            ax2.imshow(x,cmap='Greys_r');ax2.set_title('Predicted Image');ax2.axis('off')
+        else:
+            ax1.imshow(NORMtoRGB(_testImages));ax1.set_title('Input Image');ax1.axis('off')
+            ax2.imshow(NORMtoRGB(x));ax2.set_title('Predicted Image');ax2.axis('off')
         ax3.imshow(anomalyMap);ax3.set_title('Anomaly Difference');ax3.axis('off')
 
         self.logger.LogMatplotLib(fig,"Anomaly Detection",epoch)
         if self.rawImage:
             plt.imshow(finalPlot)
-            self.logger.SaveImage("{}_Epoch{}".format("Reconstruction",epoch),bbox_inches='tight')
+            self.logger.SaveImage("{}_Epoch{}".format("Anomaly",epoch),bbox_inches='tight')
         plt.close()
 
         if self.makeGIF:
