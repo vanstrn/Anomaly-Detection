@@ -3,6 +3,7 @@ import argparse
 import tensorflow as tf
 import os
 import json
+import numpy as np
 import logging
 from utils.utils import LoadConfig,CreatePath,GetFunction,UpdateNestedDictionary
 from utils.utils import LoadDataset,Logger,JSON_Load
@@ -21,6 +22,8 @@ parser.add_argument("-p", "--processor", required=False, default="gpu0",
                     help="Processor identifier string. [cpu / gpu0 / gpu1]")
 parser.add_argument("--test", required=False,
                     action="store_true",help="Flag to skip testing")
+parser.add_argument("--seed", required=False,
+                    default=None, help="Seed input to set tensorflow and numpy seed.")
 args = parser.parse_args()
 
 #Reading in the config files.
@@ -41,6 +44,10 @@ logger = Logger('./logs/'+settings["RunName"])
 logger.RecordGitState()
 
 log.info("Running the expeiment with {}. CUDA_VISIBLE_DEVICES={}".format(args.processor,os.getenv("CUDA_VISIBLE_DEVICES")))
+
+if args.seed is None:
+    tf.random.set_seed(args.seed)
+    np.random.seed(args.seed)
 
 try:
     dataset = LoadDataset(settings)
