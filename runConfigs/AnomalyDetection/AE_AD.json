@@ -1,7 +1,8 @@
 { "RunName":"AE_AD_1",
   "NetworkHPs":{
     "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
-    "Epochs":25
+    "Epochs":25,
+    "LatentSize":8
   },
 
   "Method":"methods.Autoencoder.Autoencoder",
@@ -12,11 +13,11 @@
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotReconstruction",
-      "Arguments":{}},
+      "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotImageAnomaly",
-      "Arguments":{}}
+      "Arguments":{"rawImage":true}}
     ]
 
   }

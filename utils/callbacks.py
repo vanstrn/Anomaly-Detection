@@ -62,7 +62,7 @@ class PlotGenerator(tf.keras.callbacks.Callback):
             if x.shape[-1]==1:
                 plt.imshow(x,cmap='Greys_r')
             plt.axis('off')
-            self.logger.SaveImage("{}_Epoch{}".format(self.name,epoch),bbox_inches='tight')
+            self.logger.SaveImage(fig,"{}_Epoch{}".format(self.name,epoch),bbox_inches='tight')
 
         plt.close()
         if self.makeGIF:
@@ -118,8 +118,9 @@ class PlotReconstruction(tf.keras.callbacks.Callback):
         finalPlot = np.concatenate(imageColumns,axis=1)
         self.logger.LogImage(np.expand_dims(finalPlot,axis=0),"Reconstruction",epoch)
         if self.rawImage:
+            fig = plt.figure()
             plt.imshow(finalPlot)
-            self.logger.SaveImage("{}_Epoch{}".format("Reconstruction",epoch),bbox_inches='tight')
+            self.logger.SaveImage(fig,"{}_Epoch{}".format("Reconstruction",epoch),bbox_inches='tight')
         plt.close()
 
         if self.makeGIF:
@@ -180,10 +181,9 @@ class PlotImageAnomaly(tf.keras.callbacks.Callback):
             ax2.imshow(NORMtoRGB(x));ax2.set_title('Predicted Image');ax2.axis('off')
         ax3.imshow(anomalyMap);ax3.set_title('Anomaly Difference');ax3.axis('off')
 
-        self.logger.LogMatplotLib(fig,"Anomaly Detection",epoch)
         if self.rawImage:
-            plt.imshow(finalPlot)
-            self.logger.SaveImage("{}_Epoch{}".format("Anomaly",epoch),bbox_inches='tight')
+            self.logger.SaveImage(fig,"{}_Epoch{}".format("Anomaly",epoch),bbox_inches='tight')
+        self.logger.LogMatplotLib(fig,"Anomaly Detection",epoch)
         plt.close()
 
         if self.makeGIF:
@@ -225,7 +225,7 @@ class TestAnomaly(tf.keras.callbacks.Callback):
         self.logger.LogMatplotLib(fig,"ROC_Curve",epoch)
         self.logger.LogScalar("AUC",roc_auc,epoch)
         if self.rawImage:
-            self.logger.SaveImage("{}_Epoch{}".format("ROC_Curve",epoch),bbox_inches='tight')
+            self.logger.SaveImage(fig,"{}_Epoch{}".format("ROC_Curve",epoch),bbox_inches='tight')
         plt.close()
 
 
@@ -276,5 +276,5 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
 
         self.logger.LogMatplotLib(fig,"Latent_Vis",epoch)
         if self.rawImage:
-            self.logger.SaveImage("{}_Epoch{}".format("Latent_Vis",epoch),bbox_inches='tight')
+            self.logger.SaveImage(fig,"{}_Epoch{}".format("Latent_Vis",epoch),bbox_inches='tight')
         plt.close()

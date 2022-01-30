@@ -1,4 +1,4 @@
-{ "RunName":"AE_v2",
+{ "RunName":"AE_v3_1",
   "NetworkHPs":{
     "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
     "Epochs":25
@@ -9,8 +9,6 @@
               "Arguments":{}},
 
   "Callbacks":[
-    {"Name":"utils.callbacks.LogTraining",
-      "Arguments":{}}
     ]
 
   }

@@ -102,6 +102,9 @@ class Autoencoder_v2(BaseMethod):
         latent=self.Encoder.predict({"image":testImages})["Latent"]
         return self.Generator.predict({"latent":latent})["Decoder"]
 
+    def AnomalyScore(self,testImages):
+        return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))
+
     def LatentFromImage(self,sample):
         return self.Encoder.predict(sample)["Latent"]
 

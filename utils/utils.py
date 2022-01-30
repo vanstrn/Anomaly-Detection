@@ -110,8 +110,8 @@ class Logger():
             summary = tf.summary.scalar(tag,value,step=tf.cast(step, tf.int64))
         self.writer.flush()
 
-    def SaveImage(self,name,format="png",**kwargs):
-        plt.savefig("{}/images/{}.{}".format(self.LOG_PATH,name,format),**kwargs)
+    def SaveImage(self,fig,name,format="png",**kwargs):
+        fig.savefig("{}/images/{}.{}".format(self.LOG_PATH,name,format),**kwargs)
 
     def LogImage(self,image,name,step):
         with self.writer.as_default():
@@ -137,10 +137,9 @@ def plot_to_image(figure):
   returns it. The supplied figure is closed and inaccessible after this call."""
   # Save the plot to a PNG in memory.
   buf = io.BytesIO()
-  plt.savefig(buf, format='png')
+  figure.savefig(buf, format='png')
   # Closing the figure prevents it from being displayed directly inside
   # the notebook.
-  plt.close(figure)
   buf.seek(0)
   # Convert PNG buffer to TF image
   image = tf.image.decode_png(buf.getvalue(), channels=4)

@@ -14,9 +14,13 @@
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotGenerator",
-      "Arguments":{}},
+      "Arguments":{"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
-      "Arguments":{}}
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotImageAnomaly",
+      "Arguments":{"rawImage":true}},
+    {"Name":"utils.callbacks.PlotLatentSpace",
+      "Arguments":{"rawImage":true}}
     ]
 
   }

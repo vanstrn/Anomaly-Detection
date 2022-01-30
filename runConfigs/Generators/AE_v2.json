@@ -2,7 +2,8 @@
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
-    "Epochs":25
+    "Epochs":25,
+    "LatentSize":8
   },
 
   "Method":"methods.Autoencoder.Autoencoder_v2",
@@ -13,9 +14,9 @@
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotReconstruction",
-      "Arguments":{"dy":2,"fixedSet":true,"makeGIF":true}},
+      "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.PlotLatentSpace",
-      "Arguments":{}}
+      "Arguments":{"rawImage":true}}
     ]
 
   }
