@@ -1,11 +1,12 @@
 { "RunName":"AE_AD_v2_1",
   "NetworkHPs":{
-    "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
+    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
+    "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
     "Epochs":25,
     "LatentSize":8
   },
 
-  "Method":"methods.Autoencoder.Autoencoder_v2",
+  "Method":"methods.Autoencoder.Autoencoder_v3",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 

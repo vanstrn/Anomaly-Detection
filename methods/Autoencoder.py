@@ -50,15 +50,15 @@ class Autoencoder(BaseMethod):
 
         return {"Autoencoder Loss": loss}
 
-    def ImagesFromLatent(self,sample):
-        return self.Generator.predict(sample)["Decoder"]
 
     def ImagesFromImage(self,testImages):
-        latent=self.Encoder.predict({"image":testImages})["Latent"]
-        return self.Generator.predict({"latent":latent})["Decoder"]
+        return self.Model.predict({"image":testImages})["Decoder"]
 
-    def LatentFromImage(self,sample):
-        return self.Encoder.predict(sample)["Latent"]
+    def LatentFromImage(self,testImages):
+        return self.Model.predict({"image":testImages})["Latent"]
+
+    def AnomalyScore(self,testImages):
+        return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))
 
 class Autoencoder_v2(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
