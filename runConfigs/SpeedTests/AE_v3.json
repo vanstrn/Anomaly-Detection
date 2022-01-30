@@ -1,0 +1,20 @@
+{ "RunName":"AE_v3_1",
+  "NetworkHPs":{
+    "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
+    "Epochs":25
+  },
+
+  "Method":"methods.Autoencoder.Autoencoder_v2",
+  "Dataset":{ "Name":"MNIST_RECON",
+              "Arguments":{}},
+
+  "Callbacks":[
+  {"Name":"utils.callbacks.LogTraining",
+    "Arguments":{}},
+  {"Name":"utils.callbacks.PlotReconstruction",
+    "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
+  {"Name":"utils.callbacks.PlotLatentSpace",
+    "Arguments":{"rawImage":true}}
+    ]
+
+  }

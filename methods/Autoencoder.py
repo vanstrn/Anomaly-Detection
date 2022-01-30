@@ -13,6 +13,57 @@ class Autoencoder(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
         """Initializing Model and all Hyperparameters """
 
+
+        self.HPs.update({
+                    "LearningRate":0.00005,
+                    "LatentSize":64,
+                    "Optimizer":"Adam",
+                    "Epochs":10,
+                    "BatchSize":64,
+                     })
+
+        self.requiredParams.Append([
+                "NetworkConfig",
+                ])
+
+        super().__init__(settingsDict)
+
+        #Processing Other inputs
+        self.inputSpec=dataset.inputSpec
+        networkConfig.update(dataset.outputSpec)
+        self.Model = CreateModel(self.HPs["NetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
+
+        self.optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
+        self.mse = tf.keras.losses.MeanSquaredError()
+
+    @tf.function
+    def TrainStep(self,images):
+
+        with tf.GradientTape() as tape:
+            generatedImages = self.Model(images, training=True)["Decoder"]
+
+            loss = self.mse(images["image"],generatedImages)
+
+        gradients = tape.gradient(loss, self.Model.trainable_variables)
+
+        self.optimizer.apply_gradients(zip(gradients, self.Model.trainable_variables))
+
+        return {"Autoencoder Loss": loss}
+
+    def ImagesFromLatent(self,sample):
+        return self.Generator.predict(sample)["Decoder"]
+
+    def ImagesFromImage(self,testImages):
+        latent=self.Encoder.predict({"image":testImages})["Latent"]
+        return self.Generator.predict({"latent":latent})["Decoder"]
+
+    def LatentFromImage(self,sample):
+        return self.Encoder.predict(sample)["Latent"]
+
+class Autoencoder_v2(BaseMethod):
+    def __init__(self,settingsDict,dataset,networkConfig={}):
+        """Autoencoder test method. This implementation runs about 5-10% slower than the base Autoencoding method."""
+
         self.HPs.update({
                     "LearningRate":0.00005,
                     "Optimizer":"Adam",
@@ -51,12 +102,12 @@ class Autoencoder(BaseMethod):
         return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))
 
 
-class Autoencoder_v2(BaseMethod):
+class Autoencoder_v3(BaseMethod):
     def __init__(self,settingsDict,dataset,networkConfig={}):
-        """Autoencoder test method. This implementation runs at same speed as above implementation(If anything 1-2% Faster)"""
+        """Autoencoder test method. This implementation runs about 4-8% slower than the base Autoencoding method."""
 
         self.HPs.update({
-                    "LearningRate":0.0001,
+                    "LearningRate":0.00005,
                     "LatentSize":64,
                     "Optimizer":"Adam",
                     "Epochs":10,
@@ -104,57 +155,6 @@ class Autoencoder_v2(BaseMethod):
 
     def AnomalyScore(self,testImages):
         return tf.reduce_sum((testImages-self.ImagesFromImage(testImages))**2,axis=list(range(1,len(testImages.shape))))
-
-    def LatentFromImage(self,sample):
-        return self.Encoder.predict(sample)["Latent"]
-
-
-class Autoencoder_v3(BaseMethod):
-    def __init__(self,settingsDict,dataset,networkConfig={}):
-        """Autoencoder test method. This implementation runs about 5-10% above the base Autoencoding method."""
-
-        self.HPs.update({
-                    "LearningRate":0.00005,
-                    "LatentSize":64,
-                    "Optimizer":"Adam",
-                    "Epochs":10,
-                    "BatchSize":64,
-                     })
-
-        self.requiredParams.Append([
-                "NetworkConfig",
-                ])
-
-        super().__init__(settingsDict)
-
-        #Processing Other inputs
-        self.inputSpec=dataset.inputSpec
-        networkConfig.update(dataset.outputSpec)
-        self.Model = CreateModel(self.HPs["NetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
-
-        self.optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.mse = tf.keras.losses.MeanSquaredError()
-
-    @tf.function
-    def TrainStep(self,images):
-
-        with tf.GradientTape() as tape:
-            generatedImages = self.Model(images, training=True)["Decoder"]
-
-            loss = self.mse(images["image"],generatedImages)
-
-        gradients = tape.gradient(loss, self.Model.trainable_variables)
-
-        self.optimizer.apply_gradients(zip(gradients, self.Model.trainable_variables))
-
-        return {"Autoencoder Loss": loss}
-
-    def ImagesFromLatent(self,sample):
-        return self.Generator.predict(sample)["Decoder"]
-
-    def ImagesFromImage(self,testImages):
-        latent=self.Encoder.predict({"image":testImages})["Latent"]
-        return self.Generator.predict({"latent":latent})["Decoder"]
 
     def LatentFromImage(self,sample):
         return self.Encoder.predict(sample)["Latent"]

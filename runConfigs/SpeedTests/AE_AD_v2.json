@@ -1,13 +1,12 @@
-{ "RunName":"AE_v2",
+{ "RunName":"AE_AD_v2_1",
   "NetworkHPs":{
-    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
-    "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
+    "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
     "Epochs":25,
     "LatentSize":8
   },
 
   "Method":"methods.Autoencoder.Autoencoder_v2",
-  "Dataset":{ "Name":"MNIST_RECON",
+  "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
   "Callbacks":[
@@ -15,6 +14,10 @@
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotReconstruction",
       "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.TestAnomaly",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotImageAnomaly",
+      "Arguments":{"rawImage":true}},
     {"Name":"utils.callbacks.PlotLatentSpace",
       "Arguments":{"rawImage":true}}
     ]

@@ -1,4 +1,4 @@
-{ "RunName":"BiGAN",
+{ "RunName":"BiGAN_1",
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/BiGAN_Discriminator.json",

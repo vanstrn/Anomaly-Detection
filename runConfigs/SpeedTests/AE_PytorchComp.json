@@ -1,10 +1,11 @@
-{ "RunName":"AE_v3_1",
+{ "RunName":"AE_PytorchComp_1",
   "NetworkHPs":{
     "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
-    "Epochs":25
+    "Epochs":25,
+    "LatentSize":8
   },
 
-  "Method":"methods.Autoencoder.Autoencoder_v3",
+  "Method":"methods.Autoencoder.Autoencoder",
   "Dataset":{ "Name":"MNIST_RECON",
               "Arguments":{}},
 

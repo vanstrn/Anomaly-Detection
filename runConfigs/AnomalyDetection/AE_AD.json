@@ -17,6 +17,8 @@
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotImageAnomaly",
+      "Arguments":{"rawImage":true}},
+    {"Name":"utils.callbacks.PlotLatentSpace",
       "Arguments":{"rawImage":true}}
     ]
 

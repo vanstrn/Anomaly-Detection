@@ -1,4 +1,4 @@
-{ "RunName":"AE",
+{ "RunName":"AE_1",
   "NetworkHPs":{
     "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
     "Epochs":25

@@ -58,9 +58,9 @@ Convolutional networks were used for both cases, but are slightly different beca
 Testing was performed on GTX1050. (Optimal  may vary by GPU )
 
 Pytorch script is `torch-test/AutoencoderTorch.py`. Docker image for pytorch is included in `docker/` folder.
-Tensorflow script is `python Training.py -f AE_v3.json`
+Tensorflow script is `python Training.py -f AE_PytorchComp.json`
 
 
-## Code Notes 
+## Code Notes
 ### Network Generation
 This code base uses a modularly defined json files to define different network architectures.
