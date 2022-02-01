@@ -3,7 +3,8 @@
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
     "LatentNetworkConfig":"netConfigs/GAN/Encoder.json",
-    "Epochs":25
+    "Epochs":25,
+    "LatentSize":8
   },
 
   "Method":"methods.AnoGAN.AnoGAN",

@@ -1,6 +1,6 @@
 { "RunName":"VAE_AD_1",
   "NetworkHPs":{
-    "NetworkConfig":"netConfigs/VAE/BasicVAE.json",
+    "NetworkConfig":"netConfigs/VAE/BasicVAE_v2.json",
     "Epochs":25,
     "LatentSize":8
   },
