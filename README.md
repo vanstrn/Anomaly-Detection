@@ -15,7 +15,7 @@ This repo is based on a creating docker images. Steps for installation:
    - __Bash script__ - Run `bash scripts/alias` to register docker alias for running bash scripts. You can then run bash scripts with `vision bash experiment_bash_script.bash`
 
 ## Implementations and Results
-Please reference wiki page (TBD) for detailed method descriptions and results.
+[Wiki Homepage](https://github.com/vanstrn/MV/wiki) summarizes major results and method implementations.
 
 ### Classifiers
 - Classifier: `python Training.py -f Classifier.json`
