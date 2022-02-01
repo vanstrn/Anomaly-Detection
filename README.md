@@ -17,25 +17,7 @@ This repo is based on a creating docker images. Steps for installation:
 ## Implementations and Results
 [Wiki Homepage](https://github.com/vanstrn/MV/wiki) summarizes major results and method implementations.
 
-### Classifiers
-- Classifier: `python Training.py -f Classifier.json`
-
-### Generators
-These methods take a training set of images, and learn how to generate them.
-- Auto Encoder (AE): `python Training.py -f AE.json`
-- Variational Auto Encoder (VAE): `python Training.py -f VAE.json`
-- Generative Adversarial Network (GAN): `python Training.py -f GAN.json`
-- Wasserstein Generative Adversarial Network (WGAN): `python Training.py -f WGAN.json`
-- Bi-Directional Generative Adversarial Network (BiGAN): `python Training.py -f BiGAN.json`
-
-### Anomaly Detection
-These methods take a training set of images, learn how to generate them, and then can be used to identify images not from the training set.
-- AE: `python Training.py -f AE_AD.json`
-- VAE: `python Training.py -f VAE_AD.json`
-- AnoGAN: `python Training.py -f Anogan.json`
-- fAnoGAN: `python Training.py -f fAnoGAN.json`
-- GANomaly: `python Training.py -f Ganomaly.json`
-
+Examples of runing all the code are provided in the [Running the Code ](https://github.com/vanstrn/MV/wiki/Running-the-Code) wiki page.
 
 ## Example Results
 Example generation of digits:\
