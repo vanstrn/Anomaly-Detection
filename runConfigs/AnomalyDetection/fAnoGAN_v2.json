@@ -1,13 +1,13 @@
 { "RunName":"fAnoGAN_1",
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
-    "DiscNetworkConfig":"netConfigs/GAN/WassDiscriminator.json",
+    "DiscNetworkConfig":"netConfigs/GAN/BiGAN_Discriminator.json",
     "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
     "Epochs":25,
     "LatentSize":8
   },
 
-  "Method":"methods.fAnoGAN.fAnoGAN",
+  "Method":"methods.fAnoGAN.fAnoGAN_v2",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 

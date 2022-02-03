@@ -7,7 +7,7 @@
     "LatentSize":8
   },
 
-  "Method":"methods.fAnoGAN.fAnoWGAN",
+  "Method":"methods.fAnoGAN.fAnoWGAN_v2",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
