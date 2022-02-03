@@ -1,4 +1,11 @@
 
+""" Implementation of Ganomaly from "GANomaly: Semi-Supervised Anomaly Detection via Adversarial Training" (Asian conference on computer vision 2018)
+
+Method Description: TBD
+
+Code is based on https://github.com/samet-akcay/ganomaly
+"""
+
 import numpy as np
 import tensorflow as tf
 import logging
@@ -47,21 +54,9 @@ class GANomaly(BaseMethod):
         self.encoderOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         self.crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
-    def Train(self,data,callbacks=[]):
-        self.InitializeCallbacks(callbacks)
-        trainDataset = self.SetupDataset(data)
-        for epoch in range(self.HPs["Epochs"]):
-            ts = time.time()
-
-            for batch in trainDataset:
-                info1={}
-                info2 = self.TrainStepXZX(batch)
-            self.ExecuteEpochEndCallbacks(epoch,{**info1,**info2})
-            log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
-        self.ExecuteTrainEndCallbacks({})
-
     @tf.function
     def TrainStepGAN(self,images):
+        """This is a function for 'GAN' training in which a random latent variable is used. *This is not used in Ganomaly.*"""
         randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
         with tf.GradientTape() as genTape, tf.GradientTape() as discTape:
@@ -86,8 +81,8 @@ class GANomaly(BaseMethod):
 
         return {"Generator Loss": genLoss,"Discriminator Loss": discLoss}
 
-    # @tf.function
-    def TrainStepXZX(self,images):
+    @tf.function
+    def TrainStep(self,images):
 
         with tf.GradientTape() as genTape, tf.GradientTape() as encTape, tf.GradientTape() as discTape:
             z = self.Encoder(images, training=True)["Latent"]
@@ -99,18 +94,17 @@ class GANomaly(BaseMethod):
             realPred = realOutput["Discrim"]; realFeatures = realOutput["Features"]
             fakePred = fakeOutput["Discrim"]; fakeFeatures = fakeOutput["Features"]
 
-            genLoss = self.crossEntropy(tf.ones_like(fakePred), fakePred)
             featLoss = tf.reduce_mean(realFeatures-fakeFeatures)**2.0
             discLoss = self.crossEntropy(tf.ones_like(realPred), realPred) + \
                         self.crossEntropy(tf.zeros_like(fakePred), fakePred)
 
             encoderLoss = tf.reduce_mean((z_hat-z)**2)
             contextLoss = tf.reduce_mean(tf.math.abs(x_hat-images["image"]))
-            totalLoss = encoderLoss + contextLoss + genLoss + featLoss
+            totalLoss = encoderLoss + contextLoss + featLoss
 
         generatorGradients = genTape.gradient(totalLoss, self.Generator.trainable_variables)
-        discriminatorGradients = discTape.gradient(totalLoss, self.Discriminator.trainable_variables)
         encoderGradients = encTape.gradient(totalLoss, self.Encoder.trainable_variables+self.Encoder2.trainable_variables)
+        discriminatorGradients = discTape.gradient(discLoss, self.Discriminator.trainable_variables)
 
         self.generatorOptimizer.apply_gradients(zip(generatorGradients, self.Generator.trainable_variables))
         self.encoderOptimizer.apply_gradients(zip(encoderGradients, self.Encoder.trainable_variables+self.Encoder2.trainable_variables))
