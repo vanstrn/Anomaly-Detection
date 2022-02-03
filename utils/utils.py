@@ -63,6 +63,14 @@ def GetFunction(string):
     return func
 
 
+def MergeDictValues(listInputDict):
+    """Calculating average values of keys in dict"""
+    outputDict={}
+    for k in listInputDict[0].keys():
+        outputDict[k] = np.mean([d[k] for d in listInputDict])
+    return outputDict
+
+
 def CreatePath(path, override=False):
     """
     Create directory

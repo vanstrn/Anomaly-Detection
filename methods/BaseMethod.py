@@ -3,6 +3,7 @@ import logging
 from methods.utils import Requirements
 import time
 from pprint import pformat
+from utils.utils import MergeDictValues
 
 log = logging.getLogger(__name__)
 
@@ -34,10 +35,11 @@ class BaseMethod():
         train_dataset = self.SetupDataset(data)
         for epoch in range(self.HPs["Epochs"]):
             ts = time.time()
-
+            infoList = []
             for batch in train_dataset:
                 info = self.TrainStep(batch)
-            self.ExecuteEpochEndCallbacks(epoch,info)
+                infoList.append(info)
+            self.ExecuteEpochEndCallbacks(epoch,MergeDictValues(infoList))
             log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
         self.ExecuteTrainEndCallbacks({})
 
