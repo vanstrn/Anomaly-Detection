@@ -15,7 +15,7 @@ class Autoencoder(BaseMethod):
 
 
         self.HPs.update({
-                    "LearningRate":0.00005,
+                    "LearningRate":0.001,
                     "LatentSize":64,
                     "Optimizer":"Adam",
                     "Epochs":10,
