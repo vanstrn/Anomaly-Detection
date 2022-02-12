@@ -1,0 +1,29 @@
+{ "RunName":"ALAD_1",
+  "NetworkHPs":{
+    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
+    "DiscXXNetworkConfig":"netConfigs/ALAD/DiscriminatorXX.json",
+    "DiscXZNetworkConfig":"netConfigs/ALAD/DiscriminatorXZ.json",
+    "DiscZZNetworkConfig":"netConfigs/ALAD/DiscriminatorZZ.json",
+    "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
+    "Epochs":25,
+    "LatentSize":8
+  },
+
+  "Method":"methods.ALAD.ALAD",
+  "Dataset":{ "Name":"MNIST_Anomaly",
+              "Arguments":{}},
+
+  "Callbacks":[
+    {"Name":"utils.callbacks.LogTraining",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotGenerator",
+      "Arguments":{"fixedLatent":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.TestAnomaly",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotImageAnomaly",
+      "Arguments":{"rawImage":true}},
+    {"Name":"utils.callbacks.PlotLatentSpace",
+      "Arguments":{"rawImage":true}}
+    ]
+
+  }
