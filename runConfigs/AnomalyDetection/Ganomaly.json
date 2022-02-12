@@ -15,7 +15,7 @@
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotGenerator",
-      "Arguments":{"fixedSet":true,"makeGIF":true}},
+      "Arguments":{"fixedLatent":true,"makeGIF":true}},
     {"Name":"utils.callbacks.PlotReconstruction",
       "Arguments":{"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",

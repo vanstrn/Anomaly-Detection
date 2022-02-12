@@ -1,8 +1,7 @@
 { "RunName":"AnoGAN_1",
   "NetworkHPs":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
-    "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
-    "LatentNetworkConfig":"netConfigs/GAN/Encoder.json",
+    "DiscNetworkConfig":"netConfigs/GAN/Discriminator.json",
     "Epochs":25,
     "LatentSize":8
   },
@@ -15,12 +14,10 @@
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotGenerator",
-      "Arguments":{"fixedSet":true,"makeGIF":true}},
+      "Arguments":{"fixedLatent":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotImageAnomaly",
-      "Arguments":{"rawImage":true}},
-    {"Name":"utils.callbacks.PlotLatentSpace",
       "Arguments":{"rawImage":true}}
     ]
 
