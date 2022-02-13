@@ -4,6 +4,9 @@ https://arxiv.org/pdf/1812.02288.pdf
 Reference code: https://github.com/houssamzenati/Adversarially-Learned-Anomaly-Detection
 
 Method Description: TBD
+
+Method Review: Relatively complicated architecture requiring 3 discriminators seems overkill.
+Discriminators are used to enforce cycle consistency in generator and encoder, which generally can be accomplished with simplier losses.
 """
 import numpy as np
 import tensorflow as tf
@@ -25,7 +28,7 @@ class ALAD(BaseMethod):
         """Initializing Model and all Hyperparameters """
 
         self.HPs.update({
-                    "LearningRate":0.00005,
+                    "LearningRate":0.0001,
                     "LatentSize":64,
                     "Optimizer":"Adam",
                     "Epochs":10,
@@ -33,7 +36,7 @@ class ALAD(BaseMethod):
                     "DropRemainder":True,
                     "BetaXZ":1.0,
                     "BetaXX":1.0,
-                    "BetaZZ":1.0,
+                    "BetaZZ":0.0,
                      })
 
         self.requiredParams.Append([ "GenNetworkConfig",
@@ -43,7 +46,6 @@ class ALAD(BaseMethod):
                                 "EncNetworkConfig",
                                 ])
 
-        #Chacking Valid hyperparameters are specified
         super().__init__(settingsDict)
 
         #Processing Other inputs
@@ -73,7 +75,7 @@ class ALAD(BaseMethod):
         self.generatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         self.discriminatorOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
         self.encoderOptimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
-        self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     @tf.function
     def TrainStep(self,images):
@@ -98,13 +100,13 @@ class ALAD(BaseMethod):
                         self.HPs["BetaXZ"]*self.cross_entropy(tf.zeros_like(discPredFakeXZ), discPredFakeXZ) + \
                         self.HPs["BetaXX"]*self.cross_entropy(tf.zeros_like(discPredFakeXX), discPredFakeXX) + \
                         self.HPs["BetaZZ"]*self.cross_entropy(tf.zeros_like(discPredFakeZZ), discPredFakeZZ)
-            _genLoss = self.cross_entropy(tf.zeros_like(discPredFakeXZ), discPredFakeXZ)
-            _encLoss = self.cross_entropy(tf.ones_like(discPredRealXZ), discPredRealXZ)
+            _genLoss = self.cross_entropy(tf.ones_like(discPredFakeXZ), discPredFakeXZ)
+            _encLoss = self.cross_entropy(tf.zeros_like(discPredRealXZ), discPredRealXZ)
 
-            cycleLoss = self.HPs["BetaXX"]*self.cross_entropy(tf.ones_like(discPredRealXX), discPredRealXX) + \
-                        self.HPs["BetaZZ"]*self.cross_entropy(tf.ones_like(discPredRealZZ), discPredRealZZ) + \
-                        self.HPs["BetaXX"]*self.cross_entropy(tf.zeros_like(discPredFakeXX), discPredFakeXX) + \
-                        self.HPs["BetaZZ"]*self.cross_entropy(tf.zeros_like(discPredFakeZZ), discPredFakeZZ)
+            cycleLoss = self.HPs["BetaXX"]*self.cross_entropy(tf.zeros_like(discPredRealXX), discPredRealXX) + \
+                        self.HPs["BetaZZ"]*self.cross_entropy(tf.zeros_like(discPredRealZZ), discPredRealZZ) + \
+                        self.HPs["BetaXX"]*self.cross_entropy(tf.ones_like(discPredFakeXX), discPredFakeXX) + \
+                        self.HPs["BetaZZ"]*self.cross_entropy(tf.ones_like(discPredFakeZZ), discPredFakeZZ)
             genLoss = _genLoss + cycleLoss
             encLoss = _encLoss + cycleLoss
 
@@ -117,9 +119,6 @@ class ALAD(BaseMethod):
         self.discriminatorOptimizer.apply_gradients(zip(discriminatorGradients, self.discrimVariables))
 
         return {"Generator Loss": genLoss,"Discriminator Loss": discLoss,"Encoder Loss": encLoss, "Cycle Loss": cycleLoss}
-
-    def Test(self,data):
-        pass
 
     def InitializeCallbacks(self,callbacks):
         """Method initializes callbacks for training loops that are not `model.fit()`.

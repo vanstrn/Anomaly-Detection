@@ -45,7 +45,7 @@
         "layerInput":"Features",
         "Output":true,
         "Parameters":{"units":1,
-                      "activation":null}}
+                      "activation":"sigmoid"}}
 
     ]
   }

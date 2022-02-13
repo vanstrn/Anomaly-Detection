@@ -24,7 +24,7 @@
         "layerInput":"Dense2",
         "Output":true,
         "Parameters":{"units":1,
-                      "activation":null}}
+                      "activation":"sigmoid"}}
 
     ]
   }
