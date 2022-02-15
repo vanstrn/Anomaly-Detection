@@ -170,6 +170,8 @@ class PlotImageAnomaly(tf.keras.callbacks.Callback):
         x = np.squeeze(np.concatenate(np.split(x,self.dy,axis=0),axis=1),axis=0)
 
         anomalyMap = (_testImages-x)**2
+        if anomalyMap.shape[-1] > 1:
+            anomalyMap = np.mean(anomalyMap,axis=-1)
 
         fig, (ax1, ax2,ax3) = plt.subplots(1, 3)
         fig.suptitle('Anomaly Detection (L - Normal Images | R - Anomalous Images)')
