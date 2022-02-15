@@ -1,0 +1,25 @@
+{ "RunName":"CIFAR_AE_AD_1",
+  "NetworkHPs":{
+    "NetworkConfig":"netConfigs/AE/CIFAR_AE_v1.json",
+    "Epochs":100,
+    "LatentSize":100
+  },
+
+  "Method":"methods.Autoencoder.Autoencoder",
+  "Dataset":{ "Name":"CIFAR_Anomaly",
+              "Arguments":{}},
+
+  "Callbacks":[
+    {"Name":"utils.callbacks.LogTraining",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotReconstruction",
+      "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.TestAnomaly",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotImageAnomaly",
+      "Arguments":{"rawImage":true}},
+    {"Name":"utils.callbacks.PlotLatentSpace",
+      "Arguments":{"rawImage":true}}
+    ]
+
+  }
