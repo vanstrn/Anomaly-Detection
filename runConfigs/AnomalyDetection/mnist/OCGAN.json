@@ -1,0 +1,30 @@
+{ "RunName":"OCGAN_AD_1",
+  "NetworkHPs":{
+    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
+    "DiscImageNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
+    "DiscLatentNetworkConfig":"netConfigs/GAN/DiscriminatorLatent.json",
+    "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
+    "Epochs":150,
+    "LatentSize":16
+  },
+
+  "Method":"methods.OCGAN.OCGAN_v2",
+  "Dataset":{ "Name":"MNIST_OC_Anomaly",
+              "Arguments":{}},
+
+  "Callbacks":[
+    {"Name":"utils.callbacks.LogTraining",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotGenerator",
+      "Arguments":{"fixedLatent":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.PlotReconstruction",
+      "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.TestAnomaly",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.PlotImageAnomaly",
+      "Arguments":{"rawImage":true}},
+    {"Name":"utils.callbacks.PlotLatentSpace",
+      "Arguments":{"rawImage":true}}
+    ]
+
+  }
