@@ -68,7 +68,6 @@ logger.info("Running the expeiment with {}. CUDA_VISIBLE_DEVICES={} \n\t Actual 
 expLogger = ExperimentLogger(LOG_PATH)
 expLogger.RecordGitState()
 
-
 if args.seed is not None:
     seed = args.seed
 else:
@@ -93,7 +92,6 @@ try:
         model.Test(callbacks=callbacks)
     else:
         model.Train(dataset.trainData,callbacks=callbacks)
-
 
 except Exception as e:
     logger.warning("Closing environment due to error")
