@@ -1,10 +1,17 @@
-
+#!/usr/bin/env python
+# Created By  : Neale Van Stralen
+# version ='1.0'
+# ---------------------------------------------------------------------------
 """
+File for monitoring git status of repository while running experiments.
 Required packages:
     GitPython - `pip install gitpython`
 """
+# ---------------------------------------------------------------------------
+
 import git
 from shutil import copyfile
+
 
 def GetCurrentCommitHash(repo):
     return repo.head.object.hexsha
@@ -35,8 +42,8 @@ def SaveCurrentGitState(saveLocation,saveUntrackedFiles=False):
         dst = saveLocation+"/untrackedFiles"
         if not os.path.exists(dst):
                 os.makedirs(dst)
-        for files in untrackedFiles:
-            copyfile(files, dst)
+        for file in untrackedFiles:
+            copyfile(file, dst)
     file.close()
 
 
@@ -54,25 +61,5 @@ def GetCurrentGitState(repo):
     return repoDifferences,untrackedFiles
 
 
-def GetCurrentGitSummary(repo):
-    """Returns a two lists showing the names of dirty and untracked files."""
-
-    #Getting list of untracked files:
-    untrackedFiles = repo.untracked_files
-
-    #Getting a summary of the tracked file differences.
-    dirtyFiles  = []
-    for file in repo.index.diff(None):
-        dirtyFiles.append(file.a_path)
-
-    return dirtyFiles, untrackedFiles
-
-
-"""
-Other useful git commands that I've found:
-
-    `repo.index.diff(None)`
-        Returns a list of the files which contain differences
-"""
 if __name__ == "__main__":
     SaveCurrentGitState("test")

@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# Created By  : Neale Van Stralen
+# version ='1.0'
+# ---------------------------------------------------------------------------
+"""
+Mathematic functions for processing images and data.
+"""
+# ---------------------------------------------------------------------------
+
 import numpy as np
 
 def RGBtoNORM(images):
