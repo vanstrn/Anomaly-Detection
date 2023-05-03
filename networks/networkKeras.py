@@ -2,6 +2,9 @@
 Sets up the basic Network Class which lays out all required functions of a Neural Network.
 
 """
+import logging
+logger = logging.getLogger(__name__)
+
 import json
 from tensorflow.keras import backend as K
 from tensorflow import keras
@@ -12,8 +15,6 @@ import os
 from .layers import GetLayer
 from .utils import *
 
-import logging
-log = logging.getLogger(__name__)
 
 
 def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, training=True, printSummary=False):
@@ -54,19 +55,19 @@ def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, tr
     layers = {}
     interOutputs = {}
 
-    logging.debug("Beginning creation of Network defined by: {}".format(networkConfigFile))
+    logger.debug("Beginning creation of Network defined by: {}".format(networkConfigFile))
     #Creating All of the inputs
-    logging.debug("Defining all inputs for the NN")
+    logger.debug("Defining all inputs for the NN")
     for name_i,input_i in observationSpec.items():
-        logging.debug("Building Input: {}".format(name_i))
+        logger.debug("Building Input: {}".format(name_i))
         tmp = keras.Input(input_i,name=name_i)
         inputs[name_i] = tmp
         interOutputs["input."+name_i] = tmp
 
-    logging.debug("Beginning Creation of network Layers")
+    logger.debug("Beginning Creation of network Layers")
     for sectionName,layerList in networkConfig["NetworkStructure"].items():
         for layerDict in layerList:
-            logging.debug("Building Layer: {}".format(layerDict["layerName"]))
+            logger.debug("Building Layer: {}".format(layerDict["layerName"]))
 
             if "ReuseLayer" in layerDict:
                 layer = layers[layerDict["ReuseLayer"]]
@@ -96,7 +97,7 @@ def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, tr
                 layerInputs = interOutputs[layerDict["layerInput"]]
                 out = layer(layerInputs)
 
-            logging.debug("Built Layer with \n\tLayer Inputs: {}\n\tLayer Outpus: {}".format(layerInputs,out))
+            logger.debug("Built Layer with \n\tLayer Inputs: {}\n\tLayer Outpus: {}".format(layerInputs,out))
 
             #Way to handle multiple outputs from a layer (Fully and Partially Enumerated.)
             if "MultiOutput" in layerDict:
@@ -130,7 +131,10 @@ def CreateModel(networkConfigFile, observationSpec, variables={}, scope=None, tr
     model = keras.Model(inputs,outputs,name=scope)
 
     if printSummary:
-        model.summary(print_fn=log.info)
+        stringlist = []
+        model.summary(print_fn=lambda x: stringlist.append(x))
+        logger.info("\n\t".join(stringlist))
+
 
     return model
 
