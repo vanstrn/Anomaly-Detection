@@ -1,6 +1,6 @@
 { "NetworkName" : "BasicClassifier",
   "DefaultParams":{ "LatentSize":8,
-                    "Filters":128,
+                    "Filters":64,
                     "KernalSize":3,
                     "FCUnits":256},
 
@@ -48,6 +48,7 @@
                       "activation":null}},
       { "layerType":"Sampling",
         "layerName":"Latent",
+        "Output":true,
         "layerInput":["Mu","Sigma"],
         "Parameters":{}}
     ],
@@ -56,11 +57,6 @@
         "layerName":"DenseDecoder",
         "layerInput":"Latent",
         "Parameters":{"units":"FCUnits",
-                      "activation":"relu"}},
-      { "layerType":"Dense",
-        "layerName":"DenseDecoder",
-        "layerInput":"Latent",
-        "Parameters":{"units":256,
                       "activation":"relu"}},
       { "layerType":"Reshape",
         "layerName":"DecoderReshape",
