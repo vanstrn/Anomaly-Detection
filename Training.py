@@ -5,11 +5,14 @@
 """
 Main executable for training of machine vision experiments.
 """
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import logging
 import argparse
-from utils.utils import JSON_Load,LoadConfig,GetFunction,UpdateNestedDictionary
+from pprint import pformat
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+from utils.utils import JSON_Load,LoadConfig,GetFunction,UpdateNestedDictionary,CreatePath
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--configFile", required=True,
     help="Filename or filepath to be run.")
@@ -23,13 +26,18 @@ parser.add_argument("--test", required=False,
     action="store_true",help="Flag to skip testing")
 parser.add_argument("--seed", required=False,
     default=None, help="Seed input to set tensorflow and numpy seed.")
+parser.add_argument("-k", "--trial", required=False, default=None,
+    help="An identifier that can be added to the RunName of experiment.")
+
 args = parser.parse_args()
 #Reading in the config files.
 settings = LoadConfig(args.configFile)
 settings = UpdateNestedDictionary(settings,args.config)
+if args.trial is not None:
+    settings["RunName"] = settings["RunName"] + "_{}".format(args.trial)
 
 LOG_PATH = './logs/'+settings["RunName"]
-
+CreatePath(LOG_PATH)
 logging.basicConfig(
     level=logging.INFO,
     # format='%(levelname)s -- %(asctime)s -- %(message)s',
@@ -48,7 +56,6 @@ logger.info("Running experiment with the following config properties:\n{}".forma
 import tensorflow as tf
 import numpy as np
 import random
-from pprint import pformat
 
 from utils.logging import ExperimentLogger
 from methods.utils import LoadMethod
@@ -69,12 +76,14 @@ expLogger = ExperimentLogger(LOG_PATH)
 expLogger.RecordGitState()
 
 if args.seed is not None:
-    seed = args.seed
+    seed = np.int(args.seed)
 else:
     seed = random.randint(0, 1000000)
 logger.info("Running experiment using seed: `{}`".format(seed))
-tf.random.set_seed(args.seed)
-np.random.seed(args.seed)
+random.seed(seed)
+tf.random.set_seed(seed)
+np.random.seed(seed)
+random.seed(seed)
 
 try:
     dataset = LoadDataset(settings)
