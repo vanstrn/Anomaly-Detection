@@ -1,6 +1,16 @@
 #!/bin/bash
+# Created By  : Neale Van Stralen
+# version ='1.0'
+# ---------------------------------------------------------------------------
+###
+#   Creates aliases for easy running of scripts. Intended to be sourced to setup function in command line:
+#       source scripts/alias
+#   This is run before a script to run the script within a docker container. EX:
+#       mach_vis bash scripts AutoEncoder_AD_v1.sh
+###
+# ---------------------------------------------------------------------------
 
-vision() {
+mach_vis() {
   echo $@
   docker run -d --rm -u `id -u`:`id -g` --gpus all --network=host -v ${PWD}:${PWD} -v ~/.keras:/.keras -w ${PWD} vision-tf2 $@
 }

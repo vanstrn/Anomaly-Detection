@@ -1,23 +1,20 @@
-{ "RunName":"VAE_AD_1",
+{ "RunName":"DSVDD_v1_1",
   "NetworkHPs":{
-    "NetworkConfig":"netConfigs/VAE/BasicVAE_v2.json",
-    "Epochs":100,
+    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
+    "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
+    "Epochs":25,
     "LatentSize":8
   },
 
-  "Method":"methods.Autoencoder.Autoencoder",
+  "Method":"methods.DSVDD.DSVDD",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.PlotReconstruction",
-      "Arguments":{"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
-    {"Name":"utils.callbacks.PlotImageAnomaly",
-      "Arguments":{"rawImage":true}},
     {"Name":"utils.callbacks.PlotLatentSpace",
       "Arguments":{"rawImage":true}}
     ]
