@@ -16,7 +16,7 @@ def LoadJSONFile(fileName):
         else:
             fileName = fileName + ".json"
     else:
-        for (dirpath, dirnames, filenames) in os.walk("configs/network"):
+        for (dirpath, dirnames, filenames) in os.walk("netConfigs"):
             for filename in filenames:
                 if fileName in filename:
                     fileName = os.path.join(dirpath,filename)
