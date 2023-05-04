@@ -1,6 +1,5 @@
 { "NetworkName" : "BasicClassifier",
-  "DefaultParams":{ "Filters":128,
-                    "KernalSize":3,
+  "DefaultParams":{
                     "FCUnits":256},
 
   "NetworkStructure":{
@@ -50,7 +49,7 @@
         "layerInput":"JointFeatures",
         "Output":true,
         "Parameters":{"units":1,
-                      "activation":null}}
+                      "activation":"sigmoid"}}
 
     ]
   }

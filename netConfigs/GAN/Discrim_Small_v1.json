@@ -1,6 +1,6 @@
 { "NetworkName" : "BasicClassifier",
-  "DefaultParams":{ "Filters":128,
-                    "KernalSize":3,
+  "DefaultParams":{
+                    "DropoutRate":0.30
                     "FCUnits":256},
 
   "NetworkStructure":{
@@ -16,7 +16,7 @@
       { "layerType":"Dropout",
         "layerName":"Dropout1",
         "layerInput":"Conv2D_1",
-        "Parameters":{"rate":0.3}},
+        "Parameters":{"rate":"DropoutRate"}},
       { "layerType":"Conv2D",
         "layerName":"Conv2D_2",
         "layerInput":"Dropout1",
@@ -27,7 +27,7 @@
       { "layerType":"Dropout",
         "layerName":"Dropout2",
         "layerInput":"Conv2D_2",
-        "Parameters":{"rate":0.3}},
+        "Parameters":{"rate":"DropoutRate"}},
       { "layerType":"Flatten",
         "layerName":"Features",
         "Output":true,

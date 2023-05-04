@@ -1,7 +1,5 @@
 { "NetworkName" : "BasicClassifier",
-  "DefaultParams":{ "LatentSize":8,
-                    "Filters":128,
-                    "KernalSize":3,
+  "DefaultParams":{ 
                     "FCUnits":256},
 
   "NetworkStructure":{

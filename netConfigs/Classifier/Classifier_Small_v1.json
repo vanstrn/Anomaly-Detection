@@ -1,10 +1,10 @@
 { "NetworkName" : "BasicClassifier",
-  "DefaultParams":{ "Filters":128,
+  "DefaultParams":{ "Filters":64,
                     "KernalSize":3,
                     "FCUnits":256},
 
   "NetworkStructure":{
-    "Encoder":[
+    "Shared":[
       { "layerType":"Conv2D",
         "layerName":"Conv2D_1",
         "layerInput":"input.image",
@@ -36,12 +36,16 @@
         "Parameters":{"units":"FCUnits",
                       "activation":"relu"}},
       { "layerType":"Dense",
-        "layerName":"Discrim",
+        "layerName":"Critic_FC1",
         "layerInput":"Dense1",
+        "Parameters":{"units":"FCUnits",
+                      "activation":"relu"}},
+      { "layerType":"Dense",
+        "layerName":"Classifier",
+        "layerInput":"Critic_FC1",
         "Output":true,
-        "Parameters":{"units":1,
-                      "activation":"sigmoid"}}
-
+        "Parameters":{"units":"classes",
+                      "activation":null}}
     ]
   }
 }

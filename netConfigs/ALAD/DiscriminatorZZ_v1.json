@@ -1,13 +1,16 @@
 { "NetworkName" : "BasicClassifier",
-  "DefaultParams":{ "Filters":128,
-                    "KernalSize":3,
+  "DefaultParams":{ 
                     "FCUnits":256},
 
   "NetworkStructure":{
     "Encoder":[
+      { "layerType":"Concatenate",
+        "layerName":"LatentCombine",
+        "layerInput":["input.z","input.zRec"],
+        "Parameters":{"axis":-1}},
       { "layerType":"Dense",
         "layerName":"Dense1",
-        "layerInput":"input.latent",
+        "layerInput":"LatentCombine",
         "Parameters":{"units":"FCUnits",
                       "activation":"relu"}},
       { "layerType":"Dense",
