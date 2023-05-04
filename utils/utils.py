@@ -13,7 +13,6 @@ from importlib import import_module #Used to import module based on a string.
 from urllib.parse import unquote
 import collections.abc
 import json
-import logging
 import argparse
 
 class JSON_Load(argparse.Action):
