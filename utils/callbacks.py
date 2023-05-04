@@ -216,7 +216,7 @@ class TestAnomaly(tf.keras.callbacks.Callback):
         roc_auc = metrics.auc(fpr, tpr)
 
         fig = plt.figure(figsize=(5,5))
-        plt.title('Receiver Operating Characteristic')
+        plt.title('Receiver Operating Characteristic (Test Data)')
         plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
         plt.legend(loc = 'lower right')
         plt.plot([0, 1], [0, 1],'r--')
@@ -225,9 +225,43 @@ class TestAnomaly(tf.keras.callbacks.Callback):
         plt.ylabel('True Positive Rate')
         plt.xlabel('False Positive Rate')
         self.logger.LogMatplotLib(fig,"ROC_Curve",epoch)
-        self.logger.LogScalar("AUC",roc_auc,epoch)
+        self.logger.LogScalar("AUC/Test",roc_auc,epoch)
         if self.rawImage:
-            self.logger.SaveImage(fig,"{}_Epoch{}".format("ROC_Curve",epoch),bbox_inches='tight')
+            self.logger.SaveImage(fig,"{}_Epoch{}".format("ROC_Curve_Test",epoch),bbox_inches='tight')
+        plt.close()
+
+
+class ValidationAnomaly(tf.keras.callbacks.Callback):
+    def __init__(self,logger,dataset,rawImage=False):
+        super(ValidationAnomaly, self).__init__()
+        self.logger=logger
+        self.dataset=dataset
+        self.rawImage=rawImage
+
+    def on_epoch_end(self, epoch, logs=None):
+        """Plotting and saving several test images to specified directory. """
+
+        #Selecting a random subset of images to plot.
+        _testImages=self.dataset.validationData["image"]
+        #
+        anom_score = self.model.AnomalyScore(_testImages)
+        labels=self.dataset.validationData["anom_label"]
+        fpr, tpr, thresholds = metrics.roc_curve(labels,anom_score)
+        roc_auc = metrics.auc(fpr, tpr)
+
+        fig = plt.figure(figsize=(5,5))
+        plt.title('Receiver Operating Characteristic (Validation Data)')
+        plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
+        plt.legend(loc = 'lower right')
+        plt.plot([0, 1], [0, 1],'r--')
+        plt.xlim([0, 1])
+        plt.ylim([0, 1])
+        plt.ylabel('True Positive Rate')
+        plt.xlabel('False Positive Rate')
+        self.logger.LogMatplotLib(fig,"ROC_Curve",epoch)
+        self.logger.LogScalar("AUC/Validation",roc_auc,epoch)
+        if self.rawImage:
+            self.logger.SaveImage(fig,"{}_Epoch{}".format("ROC_Curve_Validation",epoch),bbox_inches='tight')
         plt.close()
 
 
