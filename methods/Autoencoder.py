@@ -31,6 +31,7 @@ class Autoencoder(BaseMethod):
         #Processing Other inputs
         self.inputSpec=dataset.inputSpec
         networkConfig.update(dataset.outputSpec)
+        networkConfig.update({"LatentSize":self.HPs["LatentSize"]})
         self.Model = CreateModel(self.HPs["NetworkConfig"],dataset.inputSpec,variables=networkConfig,printSummary=True)
 
         self.optimizer = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])
