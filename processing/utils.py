@@ -38,6 +38,8 @@ def GetFileContents(filename):
 
             dataDict[v.tag]["step"].append(e.step)
 
+    dataDict["File"]=filename
+
     return dataDict
 
 
@@ -75,13 +77,14 @@ def CollectDataGroupings(dataSeparations,basePath="./logs",superName="",dataLabe
     return dataFiles
 
 
-def GetAverageAUC(dataSeparations,smoothed=False,**kwargs):
+def GetAverageAUC(dataSeparations,smoothed=False,verbose=False,**kwargs):
     data = CollectDataGroupings(dataSeparations,**kwargs)
     finalData={}
     for dataName,dataGroup in data.items():
         maxList=[]
         for dataTrial in dataGroup:
-            _,i = GetValidationStop(dataTrial["AUC/Validation"]["data"],smoothed)
+            k,i = GetValidationStop(dataTrial["AUC/Validation"]["data"],smoothed)
+            if verbose: print("{:10s} | {:.4f} | {}".format(dataName,k,dataTrial["File"]))
             maxList.append(dataTrial["AUC/Test"]["data"][i])
         finalData[dataName]=np.average(maxList)
     return finalData
