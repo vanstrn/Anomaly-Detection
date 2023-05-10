@@ -68,6 +68,7 @@ if "gpu" in args.processor:
         tf.config.experimental.set_memory_growth(gpu, True)
 else:
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+    gpus = [None]
 tf.keras.backend.set_floatx('float32')
 logger.info("Running the expeiment with {}. CUDA_VISIBLE_DEVICES={} \n\t Actual GPUs: {}".format(args.processor,os.getenv("CUDA_VISIBLE_DEVICES"),gpus))
 
