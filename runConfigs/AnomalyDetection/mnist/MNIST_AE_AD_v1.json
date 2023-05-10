@@ -1,8 +1,7 @@
 { "RunName":"AE_AD_1",
   "NetworkHPs":{
     "NetworkConfig":"AE_MNIST_v1.json",
-    "Epochs":250,
-    "LatentSize":16
+    "Epochs":250
   },
 
   "Method":"methods.Autoencoder.Autoencoder",
