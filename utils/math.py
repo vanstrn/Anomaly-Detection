@@ -15,6 +15,7 @@ def RGBtoNORM(images):
 
 def NORMtoRGB(images):
     """Converting from NORMalized value(-1 to 1) to RGB (0 to 255) """
+    images=Expand(images)
     return ((images+1) * 127.5).astype(int)
 
 def RGBtoHNORM(images):
@@ -23,6 +24,7 @@ def RGBtoHNORM(images):
 
 def HNORMtoRGB(images):
     """Converting from Half NORMalized value(0 to 1) to RGB (0 to 255) """
+    images=Expand(images)
     return (images * 255).astype(int)
 
 def UNWNtoNORM(images):
@@ -39,6 +41,13 @@ def UNWNtoHNORM(images):
 
 def UNWNtoRGB(images):
     """Converting from UNknoWN value(? to ?) to RGB (0 to 255) """
+    images=Expand(images)
     _min = np.min(images)
     _max = np.max(images)
     return ((images-_min)/(_max-_min) * 255).astype(int)
+
+def Expand(images):
+    if np.shape(images)[-1]==1:
+        return np.repeat(images,3,axis=-1)
+    else:
+        return images
