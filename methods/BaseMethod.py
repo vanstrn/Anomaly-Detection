@@ -4,6 +4,7 @@ from methods.utils import Requirements
 import time
 from pprint import pformat
 from utils.utils import MergeDictValues
+from methods.schedulers import GetScheduler
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +21,8 @@ class BaseMethod():
         #Chacking Valid hyperparameters are specified
         self.requiredParams.Check(settingsDict["NetworkHPs"])
         self.HPs.update(settingsDict["NetworkHPs"])
+        if "Schedulers" in self.HPs:
+            self.InitializeSchedulers()
 
         log.info("Hyperparameters:\n{}".format(pformat(self.HPs)))
 
@@ -42,6 +45,9 @@ class BaseMethod():
             self.ExecuteEpochEndCallbacks(epoch,MergeDictValues(infoList))
             log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
         self.ExecuteTrainEndCallbacks({})
+
+        if "Schedulers" in self.HPs:
+            self.UpdateSchedulers(episode=episode,**info)
 
     def Test(self):
         self.ExecuteTrainEndCallbacks({})
@@ -88,6 +94,17 @@ class BaseMethod():
 
     def set_weights(self):
         pass
+
+    def InitializeSchedulers(self):
+        self.schedulers={}
+        for schedulerInfo in self.HPs["Schedulers"]:
+            schedName=schedulerInfo.pop("Variable")
+            self.schedulers[schedName] = GetScheduler(**schedulerInfo)
+
+    def UpdateSchedulers(self,episode=0):
+        for varName, varScheduler in self.schedulers.items():
+            self.HPs[varName] = varScheduler.StepValue(episode=episode)
+
 
 if __name__ == "__main__":
     testMethod = BaseMethod()
