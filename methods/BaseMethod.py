@@ -100,10 +100,11 @@ class BaseMethod():
         for schedulerInfo in self.HPs["Schedulers"]:
             schedName=schedulerInfo.pop("Variable")
             self.schedulers[schedName] = GetScheduler(**schedulerInfo)
+        self.UpdateSchedulers()
 
-    def UpdateSchedulers(self,episode=0):
+    def UpdateSchedulers(self,episode=0,**kwargs):
         for varName, varScheduler in self.schedulers.items():
-            self.HPs[varName] = varScheduler.StepValue(episode=episode)
+            self.HPs[varName] = varScheduler.StepValue(episode=episode,**kwargs)
 
 
 if __name__ == "__main__":
