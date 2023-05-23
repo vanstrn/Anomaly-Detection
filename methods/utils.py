@@ -2,6 +2,7 @@ import tensorflow as tf
 
 from utils.utils import GetFunction
 import logging
+import numpy as np
 
 log = logging.getLogger(__name__)
 
@@ -54,3 +55,20 @@ class Requirements():
         if not valid:
             log.error("Missing one or parameters specified above. Exiting")
             raise ValueError("Missing one or parameters specified in logging. Exiting")
+
+@tf.function
+def VanishingGradient(gradients,limit=1e-8):
+    """Takes a list of computed gradients and analyzes the ratio of gradients below a threshold,
+    producing a metric measuring the changes during learning. """
+    totalCounter = 1
+    vanishCounter = 0
+    for gradient in gradients:
+        if gradient is not None:
+            vanished=tf.math.less_equal(tf.math.abs(gradient),tf.constant(limit,dtype=tf.float32))
+            #Measuring if they are idetically zero. These are excluded from the count.
+            non_zero=tf.math.greater(tf.math.abs(gradient),tf.constant(0.0,dtype=tf.float32))
+            both=tf.math.logical_and(vanished,non_zero)
+
+            totalCounter += tf.reduce_sum(tf.cast(non_zero,tf.int32))
+            vanishCounter += tf.reduce_sum(tf.cast(both,tf.int32))
+    return vanishCounter/totalCounter
