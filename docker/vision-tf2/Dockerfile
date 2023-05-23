@@ -1,6 +1,6 @@
 
 #Loading a preexisting image, try to get as close as you can before you start building.
-FROM tensorflow/tensorflow:2.5.0-gpu
+FROM tensorflow/tensorflow:2.9.1-gpu
 
 #Running an update and upgrade. This is usually required before installing anything new.
 RUN apt-get update && \
