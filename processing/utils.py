@@ -83,9 +83,12 @@ def GetAverageAUC(dataSeparations,smoothed=False,verbose=False,**kwargs):
     for dataName,dataGroup in data.items():
         maxList=[]
         for dataTrial in dataGroup:
-            k,i = GetValidationStop(dataTrial["AUC/Validation"]["data"],smoothed)
-            if verbose: print("{:10s} | {:.4f} | {}".format(dataName,k,dataTrial["File"]))
-            maxList.append(dataTrial["AUC/Test"]["data"][i])
+            try:
+                k,i = GetValidationStop(dataTrial["AUC/Validation"]["data"],smoothed)
+                if verbose: print("{:10s} | {:.4f} | {}".format(dataName,k,dataTrial["File"]))
+                maxList.append(dataTrial["AUC/Test"]["data"][i])
+            except KeyError:
+                if verbose: print("Could not find proper data in experiment: {}".format(dataTrial["File"]))
         finalData[dataName]=np.average(maxList)
     return finalData
 
