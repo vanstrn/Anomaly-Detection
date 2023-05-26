@@ -207,10 +207,7 @@ class TestAnomaly(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         """Plotting and saving several test images to specified directory. """
 
-        #Selecting a random subset of images to plot.
-        _testImages=self.dataset.testData["image"]
-        #
-        anom_score = self.model.AnomalyScore(_testImages)
+        anom_score = self.model.AnomalyScore(self.dataset.testData["image"])
         labels=self.dataset.testData["anom_label"]
         fpr, tpr, thresholds = metrics.roc_curve(labels,anom_score)
         roc_auc = metrics.auc(fpr, tpr)
@@ -241,10 +238,7 @@ class ValidationAnomaly(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         """Plotting and saving several test images to specified directory. """
 
-        #Selecting a random subset of images to plot.
-        _testImages=self.dataset.validationData["image"]
-        #
-        anom_score = self.model.AnomalyScore(_testImages)
+        anom_score = self.model.AnomalyScore(self.dataset.validationData["image"])
         labels=self.dataset.validationData["anom_label"]
         fpr, tpr, thresholds = metrics.roc_curve(labels,anom_score)
         roc_auc = metrics.auc(fpr, tpr)
@@ -280,10 +274,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         """Plotting and saving several test images to specified directory. """
 
-        #Selecting a random subset of images to plot.
-        _testImages=self.dataset.testData["image"]
-        #
-        latent = self.model.LatentFromImage(_testImages)
+        latent = self.model.LatentFromImage(self.dataset.testData["image"])
         labels = self.dataset.testData["label"]
 
 
@@ -314,3 +305,65 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
         if self.rawImage:
             self.logger.SaveImage(fig,"{}_Epoch{}".format("Latent_Vis",epoch),bbox_inches='tight')
         plt.close()
+
+class PlotLatentReconstruction(tf.keras.callbacks.Callback):
+    def __init__(self,logger,dataset,yDim=10,xDim=10,method="PCA",rawImage=False,name="LatentReconstruction"):
+        super(PlotLatentReconstruction, self).__init__()
+        self.logger=logger
+        self.dataset=dataset
+        self.rawImage=rawImage
+        self.name=name
+        self.xDim=xDim
+        self.yDim=yDim
+        if method == "PCA":
+            self.decompMethod=PCA
+        else:
+            self.decompMethod=TSNE
+
+    def on_epoch_end(self, epoch, logs=None):
+        """Plotting a 2D sweep over the latent space to see latent space utilization in the real image space.
+        If the dimension of latent space is greater than 2, then 2D directions are selected based on the principal components of the test dataset."""
+
+        try:
+            latentSize = model.latentSize
+        except:
+            latentSize=3
+
+        if latentSize ==2:
+            latentFactor = np.array([[1,0],0,1])
+        else:
+            _testImages=self.dataset.testData["image"]
+            #
+            latent = self.model.LatentFromImage(_testImages)
+
+            feat_cols = [ 'latent'+str(i) for i in range(latent.shape[1]) ]
+            latentData = pd.DataFrame(latent,columns=feat_cols)
+            decompInstance = self.decompMethod(n_components=2)
+            latentDataTransformed = decompInstance.fit_transform(latentData[feat_cols].values)
+            maxLatentTransformed = np.amax(latentDataTransformed,axis=0)
+            minLatentTransformed = np.amin(latentDataTransformed,axis=0)
+            latentFactor=decompInstance.components_
+
+        xArray = np.linspace(maxLatentTransformed[0]+0.1,minLatentTransformed[0]-0.1,self.xDim)
+        yArray = np.linspace(maxLatentTransformed[1]+0.1,minLatentTransformed[1]-0.1,self.yDim)
+        latentTransformedTestCombos = np.stack(np.meshgrid(xArray,yArray), -1).reshape(-1, 2)
+        latentTestCombos = np.matmul(latentTransformedTestCombos,latentFactor)
+
+        latentImages = self.model.ImagesFromLatent(latentTestCombos)
+        latentImagesReshape = latentImages.reshape([self.xDim,self.yDim]+list(latentImages.shape[1:]))
+        latentImagesReshape = np.squeeze(np.concatenate(np.split(latentImagesReshape,self.xDim,axis=0),axis=2),axis=0)
+        finalPlot = np.squeeze(np.concatenate(np.split(latentImagesReshape,self.yDim,axis=0),axis=2),axis=0)
+
+        self.logger.LogImage(np.expand_dims(finalPlot,axis=0),"LatentReconstruction",epoch)
+        if self.rawImage:
+            fig = plt.figure()
+            plt.imshow(finalPlot)
+            self.logger.SaveImage(fig,"{}_Epoch{}".format("LatentReconstruction",epoch),bbox_inches='tight')
+        plt.close()
+
+    #     if self.makeGIF:
+    #         self.gifBuffer.append(NORMtoRGB(finalPlot))
+    #
+    # def on_train_end(self, logs=None):
+    #     if self.makeGIF:
+    #         self.logger.SaveGIF(clip=self.gifBuffer,name=self.name,fps=3)
