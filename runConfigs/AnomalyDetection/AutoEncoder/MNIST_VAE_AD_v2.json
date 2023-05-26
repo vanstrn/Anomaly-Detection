@@ -1,10 +1,14 @@
-{ "RunName":"AE_AD_1",
-  "NetworkHPs":{
-    "NetworkConfig":"AE_MNIST_v1.json",
-    "Epochs":250
+{ "RunName":"VAE_AD_1",
+  "HyperParams":{
+    "NetworkConfig":"netConfigs/VAE/VAE_MNIST_v1.json",
+    "Epochs":100,
+    "BatchSize":128,
+    "LearningRate":0.0001,
+    "Schedulers":[
+      {"Variable":"KLBeta","schedulerType":"Square","highValue":0.001,"lowValue":0.0,"highDuration":10,"lowDuration":10,"startHigh":false,"offset":0,"dtype":"float"}]
   },
 
-  "Method":"methods.Autoencoder.Autoencoder",
+  "Method":"methods.Autoencoder.VariationalAutoencoder",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
@@ -12,7 +16,7 @@
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotReconstruction",
-      "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
+      "Arguments":{"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.ValidationAnomaly",

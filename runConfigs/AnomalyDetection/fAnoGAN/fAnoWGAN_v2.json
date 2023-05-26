@@ -1,15 +1,13 @@
-{ "RunName":"ALAD_1",
-  "NetworkHPs":{
+{ "RunName":"fAnoWGAN_1",
+  "HyperParams":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
-    "DiscXXNetworkConfig":"netConfigs/ALAD/DiscriminatorXX.json",
-    "DiscXZNetworkConfig":"netConfigs/ALAD/DiscriminatorXZ.json",
-    "DiscZZNetworkConfig":"netConfigs/ALAD/DiscriminatorZZ.json",
+    "DiscNetworkConfig":"netConfigs/GAN/BiGAN_Discriminator.json",
     "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
-    "Epochs":25,
+    "Epochs":500,
     "LatentSize":8
   },
 
-  "Method":"methods.ALAD.ALAD",
+  "Method":"methods.fAnoGAN.fAnoWGAN_v2",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 

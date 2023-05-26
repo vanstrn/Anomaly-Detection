@@ -1,5 +1,5 @@
 { "RunName":"AE_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "NetworkConfig":"netConfigs/AE/AE_MNIST_v1.json",
     "Epochs":25
   },

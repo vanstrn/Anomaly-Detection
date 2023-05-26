@@ -1,12 +1,14 @@
-{ "RunName":"AE_AD_v2_1",
+{ "RunName":"VAE_AD_1",
   "HyperParams":{
-    "GenNetworkConfig":"netConfigs/GAN/Generator_MNIST_v2.json",
-    "EncNetworkConfig":"netConfigs/GAN/Encoder_Small_v1.json",
-    "Epochs":25,
-    "LatentSize":8
+    "NetworkConfig":"netConfigs/VAE/VAE_MNIST_v1.json",
+    "Epochs":500,
+    "BatchSize":128,
+    "LearningRate":0.0001,
+    "Schedulers":[
+      {"Variable":"KLBeta","schedulerType":"Linear","endValue":0.005,"startValue":0.0,"linearLength":20,"dtype":"float"}]
   },
 
-  "Method":"methods.Autoencoder_v2.Autoencoder_v3",
+  "Method":"methods.Autoencoder.VariationalAutoencoder",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
@@ -14,14 +16,14 @@
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotReconstruction",
-      "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
+      "Arguments":{"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
+      "Arguments":{}},
+    {"Name":"utils.callbacks.ValidationAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotImageAnomaly",
       "Arguments":{"rawImage":true}},
     {"Name":"utils.callbacks.PlotLatentSpace",
-      "Arguments":{"rawImage":true}},
-    {"Name":"utils.callbacks.PlotLatentReconstruction",
       "Arguments":{"rawImage":true}}
     ]
 

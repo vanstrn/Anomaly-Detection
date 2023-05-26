@@ -1,27 +1,24 @@
-{ "RunName":"AE_AD_v2_1",
+{ "RunName":"CIFAR_VAE_AD_1",
   "HyperParams":{
-    "GenNetworkConfig":"netConfigs/GAN/Generator_MNIST_v2.json",
-    "EncNetworkConfig":"netConfigs/GAN/Encoder_Small_v1.json",
-    "Epochs":25,
-    "LatentSize":8
+    "NetworkConfig":"netConfigs/VAE/CIFAR_VAE_v1.json",
+    "Epochs":500,
+    "LatentSize":256
   },
 
-  "Method":"methods.Autoencoder_v2.Autoencoder_v3",
-  "Dataset":{ "Name":"MNIST_Anomaly",
+  "Method":"methods.Autoencoder.Autoencoder",
+  "Dataset":{ "Name":"CIFAR_Anomaly",
               "Arguments":{}},
 
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotReconstruction",
-      "Arguments":{"dy":3,"fixedSet":true,"makeGIF":true}},
+      "Arguments":{"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotImageAnomaly",
       "Arguments":{"rawImage":true}},
     {"Name":"utils.callbacks.PlotLatentSpace",
-      "Arguments":{"rawImage":true}},
-    {"Name":"utils.callbacks.PlotLatentReconstruction",
       "Arguments":{"rawImage":true}}
     ]
 

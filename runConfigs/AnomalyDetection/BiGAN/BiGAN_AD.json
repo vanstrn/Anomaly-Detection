@@ -1,22 +1,22 @@
-{ "RunName":"VAE_AD_1",
-  "NetworkHPs":{
-    "NetworkConfig":"netConfigs/VAE/VAE_MNIST_v1.json",
-    "Epochs":100,
+{ "RunName":"BiGAN_AD_1",
+  "HyperParams":{
+    "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
+    "DiscNetworkConfig":"netConfigs/GAN/BiGAN_Discriminator.json",
+    "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
+    "Epochs":25,
     "LatentSize":8
   },
 
-  "Method":"methods.Autoencoder.Autoencoder",
+  "Method":"methods.BiGAN.BiGAN",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.PlotReconstruction",
-      "Arguments":{"fixedSet":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.PlotGenerator",
+      "Arguments":{"fixedLatent":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
-      "Arguments":{}},
-    {"Name":"utils.callbacks.ValidationAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotImageAnomaly",
       "Arguments":{"rawImage":true}},

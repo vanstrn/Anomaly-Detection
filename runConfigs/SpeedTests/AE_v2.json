@@ -1,5 +1,5 @@
 { "RunName":"AE_v2_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "NetworkConfig":"netConfigs/AE/BasicAE_v2.json",
     "Epochs":25,
     "LatentSize":8

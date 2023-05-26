@@ -1,25 +1,20 @@
-{ "RunName":"fAnoGAN_1",
-  "NetworkHPs":{
+{ "RunName":"DSVDD_v1_1",
+  "HyperParams":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
-    "DiscNetworkConfig":"netConfigs/GAN/WassDiscriminator.json",
     "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
     "Epochs":25,
     "LatentSize":8
   },
 
-  "Method":"methods.fAnoGAN.fAnoGAN",
+  "Method":"methods.DSVDD.DSVDD",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
   "Callbacks":[
     {"Name":"utils.callbacks.LogTraining",
       "Arguments":{}},
-    {"Name":"utils.callbacks.PlotGenerator",
-      "Arguments":{"fixedLatent":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
-    {"Name":"utils.callbacks.PlotImageAnomaly",
-      "Arguments":{"rawImage":true}},
     {"Name":"utils.callbacks.PlotLatentSpace",
       "Arguments":{"rawImage":true}}
     ]

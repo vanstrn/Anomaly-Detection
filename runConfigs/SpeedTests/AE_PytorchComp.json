@@ -1,5 +1,5 @@
 { "RunName":"AE_PytorchComp_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "NetworkConfig":"netConfigs/AE/BasicAE_v3.json",
     "Epochs":25,
     "LatentSize":8

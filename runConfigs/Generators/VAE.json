@@ -1,5 +1,5 @@
 { "RunName":"VAE_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "NetworkConfig":"netConfigs/VAE/BasicVAE.json",
     "Epochs":25
   },

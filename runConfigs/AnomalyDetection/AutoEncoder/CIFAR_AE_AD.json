@@ -1,5 +1,5 @@
 { "RunName":"CIFAR_AE_AD_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "NetworkConfig":"netConfigs/AE/CIFAR_AE_v1.json",
     "Epochs":100,
     "LatentSize":100

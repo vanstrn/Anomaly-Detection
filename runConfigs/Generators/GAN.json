@@ -1,5 +1,5 @@
 { "RunName":"GAN_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
     "Epochs":25

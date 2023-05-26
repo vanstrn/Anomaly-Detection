@@ -1,5 +1,5 @@
 { "RunName":"BiGAN_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "DiscNetworkConfig":"netConfigs/GAN/BiGAN_Discriminator.json",
     "EncNetworkConfig":"netConfigs/GAN/Encoder.json",

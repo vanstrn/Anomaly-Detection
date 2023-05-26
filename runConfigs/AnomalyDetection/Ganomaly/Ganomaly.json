@@ -1,13 +1,13 @@
-{ "RunName":"fAnoGAN_1",
-  "NetworkHPs":{
+{ "RunName":"Ganomaly_1",
+  "HyperParams":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
-    "DiscNetworkConfig":"netConfigs/GAN/BiGAN_Discriminator.json",
+    "DiscNetworkConfig":"netConfigs/GAN/Discriminator_v2.json",
     "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
     "Epochs":25,
     "LatentSize":8
   },
 
-  "Method":"methods.fAnoGAN.fAnoGAN_v2",
+  "Method":"methods.GANomaly.GANomaly",
   "Dataset":{ "Name":"MNIST_Anomaly",
               "Arguments":{}},
 
@@ -16,6 +16,8 @@
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotGenerator",
       "Arguments":{"fixedLatent":true,"makeGIF":true}},
+    {"Name":"utils.callbacks.PlotReconstruction",
+      "Arguments":{"fixedSet":true,"makeGIF":true}},
     {"Name":"utils.callbacks.TestAnomaly",
       "Arguments":{}},
     {"Name":"utils.callbacks.PlotImageAnomaly",

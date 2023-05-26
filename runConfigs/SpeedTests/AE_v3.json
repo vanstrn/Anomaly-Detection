@@ -1,5 +1,5 @@
 { "RunName":"AE_v3_1",
-  "NetworkHPs":{
+  "HyperParams":{
     "GenNetworkConfig":"netConfigs/GAN/Generator_v2.json",
     "EncNetworkConfig":"netConfigs/GAN/Encoder.json",
     "Epochs":25
