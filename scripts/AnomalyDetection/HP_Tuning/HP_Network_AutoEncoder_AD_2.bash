@@ -1,0 +1,44 @@
+#!/bin/bash
+
+
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout0_Netv3_FC32_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":0}}}' -n '{"FCUnits":32,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout1_Netv3_FC32_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":1}}}' -n '{"FCUnits":32,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout5_Netv3_FC32_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":5}}}' -n '{"FCUnits":32,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout7_Netv3_FC32_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":7}}}' -n '{"FCUnits":32,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout9_Netv3_FC32_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":9}}}' -n '{"FCUnits":32,"Filters":8}'
+
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout0_Netv3_FC64_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":0}}}' -n '{"FCUnits":64,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout1_Netv3_FC64_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":1}}}' -n '{"FCUnits":64,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout5_Netv3_FC64_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":5}}}' -n '{"FCUnits":64,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout7_Netv3_FC64_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":7}}}' -n '{"FCUnits":64,"Filters":8}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout9_Netv3_FC64_FT8","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":9}}}' -n '{"FCUnits":64,"Filters":8}'
+
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout0_Netv3_FC64_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":0}}}' -n '{"FCUnits":64,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout1_Netv3_FC64_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":1}}}' -n '{"FCUnits":64,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout5_Netv3_FC64_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":5}}}' -n '{"FCUnits":64,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout7_Netv3_FC64_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":7}}}' -n '{"FCUnits":64,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout9_Netv3_FC64_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":9}}}' -n '{"FCUnits":64,"Filters":16}'
+
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout0_Netv3_FC128_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":0}}}' -n '{"FCUnits":128,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout1_Netv3_FC128_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":1}}}' -n '{"FCUnits":128,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout5_Netv3_FC128_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":5}}}' -n '{"FCUnits":128,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout7_Netv3_FC128_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":7}}}' -n '{"FCUnits":128,"Filters":16}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout9_Netv3_FC128_FT16","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":9}}}' -n '{"FCUnits":128,"Filters":16}'
+
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout0_Netv3_FC128_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":0}}}' -n '{"FCUnits":128,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout1_Netv3_FC128_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":1}}}' -n '{"FCUnits":128,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout5_Netv3_FC128_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":5}}}' -n '{"FCUnits":128,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout7_Netv3_FC128_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":7}}}' -n '{"FCUnits":128,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout9_Netv3_FC128_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":9}}}' -n '{"FCUnits":128,"Filters":32}'
+
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout0_Netv3_FC256_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":0}}}' -n '{"FCUnits":256,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout1_Netv3_FC256_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":1}}}' -n '{"FCUnits":256,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout5_Netv3_FC256_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":5}}}' -n '{"FCUnits":256,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout7_Netv3_FC256_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":7}}}' -n '{"FCUnits":256,"Filters":32}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout9_Netv3_FC256_FT32","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":9}}}' -n '{"FCUnits":256,"Filters":32}'
+
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout0_Netv3_FC256_FT64","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":0}}}' -n '{"FCUnits":256,"Filters":64}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout1_Netv3_FC256_FT64","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":1}}}' -n '{"FCUnits":256,"Filters":64}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout5_Netv3_FC256_FT64","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":5}}}' -n '{"FCUnits":256,"Filters":64}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout7_Netv3_FC256_FT64","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":7}}}' -n '{"FCUnits":256,"Filters":64}'
+python Training.py -f MNIST_AE_AD_v1.json -c '{"RunName":"MNIST_AE_AD_holdout9_Netv3_FC256_FT64","HyperParams":{"NetworkConfig":"AE_MNIST_v3.json"},"Dataset":{"Arguments":{"holdout":9}}}' -n '{"FCUnits":256,"Filters":64}'
