@@ -61,10 +61,9 @@ class CentralCropping2D(Layer):
                            'or a tuple of 2 ints '
                            '(height_crop, width_crop). '
                            f'Received: {cropping}.')
-        self.input_spec = InputSpec(ndim=4)
+        # self.input_spec = InputSpec(ndim=4)
 
     def compute_output_shape(self, input_shape):
-        print(self.input_spec)
         input_shape = tf.TensorShape(input_shape).as_list()
         # pylint: disable=invalid-unary-operand-type
         if self.data_format == 'channels_first':
