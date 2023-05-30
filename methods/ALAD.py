@@ -78,7 +78,7 @@ class ALAD(BaseMethod):
         self.cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     @tf.function
-    def TrainStep(self,images):
+    def TrainStep(self,images,hyperParams):
         randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
         images = images["image"]
         with tf.GradientTape() as genTape, tf.GradientTape() as discTape, tf.GradientTape() as encTape:

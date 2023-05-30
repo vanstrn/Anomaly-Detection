@@ -8,10 +8,8 @@ import tensorflow as tf
 def GetScheduler(schedulerType,**kwargs):
     if schedulerType == "Constant":
         return ConstantScheduler(**kwargs)
-    elif schedulerType == "LinearLinear":
+    elif schedulerType == "Linear":
         return LinearScheduler(**kwargs)
-    elif schedulerType == "OffsetLinear":
-        return OffsetLinearScheduler(**kwargs)
     elif schedulerType == "Step":
         return StepScheduler(**kwargs)
     elif schedulerType == "Square":
@@ -33,40 +31,20 @@ class ConstantScheduler():
 
 
 class LinearScheduler():
-    def __init__(self,startValue,endValue,episodeDecay,dtype="float"):
+    def __init__(self,startValue,endValue,linearLength,offset=0,dtype="float"):
         self.dtype = dtype
 
         self.startValue = startValue
         self.endValue = endValue
-        self.episodeDecay = episodeDecay
+        self.offset = offset
+        self.linearLength = linearLength
 
     def StepValue(self,episode,**kwargs):
-        if episode<self.episodeDecay:
-            value = self.endValue + (self.startValue-self.endValue)*(1-episode/self.episodeDecay)
-        else:
-            value=self.endvalue
-
-        if self.dtype=="int":
-            return int(value)
-        elif self.dtype=="float":
-            return float(value)
-
-
-class OffsetLinearScheduler():
-    def __init__(self,startValue,endValue,startEpisode,episodeDecay,dtype="float"):
-        self.dtype = dtype
-
-        self.startValue = startValue
-        self.endValue = endValue
-        self.startEpisode = startEpisode
-        self.episodeDecay = episodeDecay
-
-    def StepValue(self,episode,**kwargs):
-        if episode<self.startEpisode:
+        if episode<self.offset:
             value = self.startValue
-        elif episode<(self.episodeDecay+self.startEpisode):
-            episode_ = episode-self.startEpisode
-            value = self.endValue + (self.startValue-self.endValue)*(1-episode_/self.episodeDecay)
+        elif episode<(self.linearLength+self.offset):
+            episode_ = episode-self.offset
+            value = self.endValue + (self.startValue-self.endValue)*(1-episode_/self.linearLength)
         else:
             value=self.endValue
 

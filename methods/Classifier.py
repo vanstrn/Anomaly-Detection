@@ -26,8 +26,8 @@ class Classifier(BaseMethod):
                           ]
 
         #Chacking Valid hyperparameters are specified
-        CheckFilled(self.requiredParams,settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
+        CheckFilled(self.requiredParams,settingsDict["HyperParams"])
+        self.HPs.update(settingsDict["HyperParams"])
 
         #Processing Other inputs
         self.opt = GetOptimizer(self.HPs["Optimizer"],self.HPs["LearningRate"])

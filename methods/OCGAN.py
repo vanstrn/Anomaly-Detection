@@ -66,7 +66,7 @@ class OCGAN(BaseMethod):
         self.crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     @tf.function
-    def TrainStep(self,images):
+    def TrainStep(self,images,hyperParams):
         randomLatent = tf.random.uniform([self.HPs["BatchSize"], self.HPs["LatentSize"]],minval=-1,maxval=1)
         imageNoise = tf.random.normal(images["image"].shape,stddev=self.HPs["NoiseMagnitude"])
 

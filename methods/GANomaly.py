@@ -82,7 +82,7 @@ class GANomaly(BaseMethod):
         return {"Generator Loss": genLoss,"Discriminator Loss": discLoss}
 
     @tf.function
-    def TrainStep(self,images):
+    def TrainStep(self,images,hyperParams):
 
         with tf.GradientTape() as genTape, tf.GradientTape() as encTape, tf.GradientTape() as discTape:
             z = self.Encoder(images, training=True)["Latent"]

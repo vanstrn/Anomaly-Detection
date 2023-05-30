@@ -44,7 +44,7 @@ class GAN(BaseMethod):
         self.crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
 
     @tf.function
-    def TrainStep(self,images):
+    def TrainStep(self,images,hyperParams):
         randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
         with tf.GradientTape() as genTape, tf.GradientTape() as discTape:

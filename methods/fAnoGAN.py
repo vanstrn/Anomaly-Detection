@@ -180,7 +180,7 @@ class fAnoGAN_v2(BiGAN):
         self.mse = tf.keras.losses.MeanSquaredError()
 
     @tf.function
-    def TrainStep(self,images):
+    def TrainStep(self,images,hyperParams):
         randomLatent = tf.random.normal([self.HPs["BatchSize"], self.HPs["LatentSize"]])
 
         with tf.GradientTape() as genTape, tf.GradientTape() as discTape:

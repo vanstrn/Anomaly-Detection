@@ -9,7 +9,7 @@ from methods.schedulers import GetScheduler
 log = logging.getLogger(__name__)
 
 class BaseMethod():
-    HPs = { "BatchSize":32,
+    hyperParams = { "BatchSize":32,
             "ShuffleData":True,
             "ShuffleSize":10000,
             "DropRemainder":False,
@@ -19,35 +19,35 @@ class BaseMethod():
     def __init__(self, settingsDict, *args, **kwargs):
         #Initializing
         #Chacking Valid hyperparameters are specified
-        self.requiredParams.Check(settingsDict["NetworkHPs"])
-        self.HPs.update(settingsDict["NetworkHPs"])
-        if "Schedulers" in self.HPs:
+        self.requiredParams.Check(settingsDict["HyperParams"])
+        self.hyperParams.update(settingsDict["HyperParams"])
+        if "Schedulers" in self.hyperParams:
             self.InitializeSchedulers()
 
-        log.info("Hyperparameters:\n{}".format(pformat(self.HPs)))
+        log.info("Hyperparameters:\n{}".format(pformat(self.hyperParams)))
 
 
     def SetupDataset(self,data):
         dataset = tf.data.Dataset.from_tensor_slices(data)
-        if self.HPs["ShuffleData"]:
-            dataset = dataset.shuffle(self.HPs["ShuffleSize"])
-        return dataset.batch(self.HPs["BatchSize"],self.HPs["DropRemainder"])
+        if self.hyperParams["ShuffleData"]:
+            dataset = dataset.shuffle(self.hyperParams["ShuffleSize"])
+        return dataset.batch(self.hyperParams["BatchSize"],self.hyperParams["DropRemainder"])
 
     def Train(self,data,callbacks=[]):
         self.InitializeCallbacks(callbacks)
         train_dataset = self.SetupDataset(data)
-        for epoch in range(self.HPs["Epochs"]):
+        for epoch in range(self.hyperParams["Epochs"]):
             ts = time.time()
             infoList = []
             for batch in train_dataset:
-                info = self.TrainStep(batch)
+                info = self.TrainStep(batch,hyperParams=self.hyperParams)
                 infoList.append(info)
             self.ExecuteEpochEndCallbacks(epoch,MergeDictValues(infoList))
             log.info("End Epoch {}: Time {}".format(epoch,time.time()-ts))
-        self.ExecuteTrainEndCallbacks({})
 
-        if "Schedulers" in self.HPs:
-            self.UpdateSchedulers(episode=episode,**info)
+            if "Schedulers" in self.hyperParams:
+                self.UpdateSchedulers(episode=epoch,**MergeDictValues(infoList))
+        self.ExecuteTrainEndCallbacks({})
 
     def Test(self):
         self.ExecuteTrainEndCallbacks({})
@@ -97,17 +97,18 @@ class BaseMethod():
 
     def InitializeSchedulers(self):
         self.schedulers={}
-        for schedulerInfo in self.HPs["Schedulers"]:
+        for schedulerInfo in self.hyperParams["Schedulers"]:
             schedName=schedulerInfo.pop("Variable")
             self.schedulers[schedName] = GetScheduler(**schedulerInfo)
-        self.UpdateSchedulers()
+        for varName, varScheduler in self.schedulers.items():
+            self.hyperParams[varName] = tf.Variable(varScheduler.StepValue(episode=0))
 
     def UpdateSchedulers(self,episode=0,**kwargs):
         for varName, varScheduler in self.schedulers.items():
-            self.HPs[varName] = varScheduler.StepValue(episode=episode,**kwargs)
+            self.hyperParams[varName].assign(varScheduler.StepValue(episode=episode,**kwargs))
 
 
 if __name__ == "__main__":
     testMethod = BaseMethod()
     print(dir(BaseMethod))
-    print(BaseMethod.HPs)
+    print(BaseMethod.hyperParams)
