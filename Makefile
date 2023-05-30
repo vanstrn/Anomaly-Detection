@@ -2,7 +2,6 @@ define run_command
 		docker run -it --rm \
 			-u `id -u`:`id -g` \
 			--gpus all \
-			--memory="10G" --memory-swap="15G" \
 			--network=host \
 			-v ${PWD}:${PWD} \
 			-v ~/.keras:/.keras \
